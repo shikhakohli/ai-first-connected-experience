@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Fabrikam Partner Health Dashboard" />
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <title>Partner Health Dashboard | Fabrikam</title>
+    <link rel="stylesheet" href="./app.css?v=12" />
+  </head>
+  <body class="dashboard-page">
+    <header class="topbar">
+      <button class="icon-button menu-button" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="brand"><strong>Microsoft</strong> Partner Center</div>
+      <div class="search" role="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.4-4.4m2.4-5.1a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"/></svg>
+        <input aria-label="Search Partner Center" placeholder="Search" />
+      </div>
+      <div class="top-actions">
+        <button class="try-ai" type="button">Try AI first <span class="toggle"><i></i></span></button>
+        <button class="icon-button" aria-label="Notifications">○</button>
+        <div class="persona">
+          <button id="personaButton" class="avatar" aria-label="Account menu" aria-expanded="false">E</button>
+          <div id="personaMenu" class="persona-menu" hidden>
+            <div class="persona-current">
+              <strong>Eric</strong>
+              <span>CFO · Fabrikam</span>
+            </div>
+            <button id="switchToSarah" type="button">
+              <span class="small-avatar">S</span>
+              <span><strong>Sarah</strong><small>Alliance manager · United States</small></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="shell dashboard-shell">
+      <aside class="rail" aria-label="Primary navigation">
+        <button class="new-chat">＋ <span>New chat</span></button>
+        <nav>
+          <a href="./index.html"><span>⌂</span><span><strong>Home</strong><small>Overview and actions</small></span></a>
+          <div class="nav-heading">Agents</div>
+          <a href="#"><span>◇</span><span><strong>Financials</strong><small>Reconcile billing &amp; invoices</small></span></a>
+          <a href="./alliance-manager/index.html?persona=eric&view=customer&v=109"><span>◇</span><span><strong>Customer</strong><small>Actions and insights</small></span></a>
+          <a href="./alliance-manager/index.html?persona=eric&view=benefits&v=109"><span>◇</span><span><strong>Benefits and designations</strong><small>Actions and insights</small></span></a>
+          <a href="#"><span>◇</span><span><strong>Administration</strong><small>Explore programs and manage accounts/users</small></span></a>
+        </nav>
+        <div class="history"><strong>CHAT HISTORY</strong><span>No chat history yet</span></div>
+      </aside>
+
+      <main class="dashboard-stage">
+        <div class="dashboard-context">
+          <a href="./index.html">← Back to Eric's home</a>
+          <span>Grow / Partner Health Dashboard</span>
+        </div>
+        <iframe
+          id="healthDashboard"
+          class="dashboard-frame"
+          title="Partner Health Dashboard"
+          src="./experiences/partner-health-dashboard/dist/index.html?embedded=1&clean=36"
+        ></iframe>
+      </main>
+    </div>
+    <script src="./app.js?v=72"></script>
+    <script>
+      const healthFrame = document.getElementById("healthDashboard");
+      healthFrame.addEventListener("load", (event) => {
+        const frameDocument = event.currentTarget.contentDocument;
+        const clearInitialPanel = () => {
+          frameDocument.querySelector(".pc-chat-panel")?.remove();
+          frameDocument.querySelector(".pc-shell")?.classList.remove("with-panel");
+        };
+        clearInitialPanel();
+        window.setTimeout(clearInitialPanel, 100);
+        window.setTimeout(clearInitialPanel, 400);
+      });
+    </script>
+  </body>
+</html>

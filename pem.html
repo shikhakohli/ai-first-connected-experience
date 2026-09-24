@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Partner Economics Modeler" />
+    <title>Partner Economics Modeler | Fabrikam</title>
+    <link rel="stylesheet" href="./app.css" />
+    <link rel="stylesheet" href="./pem.css" />
+  </head>
+  <body class="pem-page">
+    <header class="topbar">
+      <button class="icon-button menu-button" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="brand"><strong>Microsoft</strong> Partner Center</div>
+      <div class="search" role="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.4-4.4m2.4-5.1a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"/></svg>
+        <input aria-label="Search Partner Center" placeholder="Search" />
+      </div>
+      <div class="top-actions">
+        <button class="try-ai" type="button">Try AI first <span class="toggle"><i></i></span></button>
+        <button class="icon-button" aria-label="Notifications">○</button>
+        <div class="persona">
+          <button id="personaButton" class="avatar" aria-label="Account menu" aria-expanded="false">E</button>
+          <div id="personaMenu" class="persona-menu" hidden>
+            <div class="persona-current">
+              <strong>Eric</strong>
+              <span>CFO · Fabrikam</span>
+            </div>
+            <button id="switchToSarah" type="button">
+              <span class="small-avatar">S</span>
+              <span><strong>Sarah</strong><small>Alliance manager · United States</small></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="shell pem-shell">
+      <aside class="rail" aria-label="Primary navigation">
+        <button class="new-chat">＋ <span>New chat</span></button>
+        <nav>
+          <a href="./index.html"><span>⌂</span><span><strong>Home</strong><small>Overview and actions</small></span></a>
+          <div class="nav-heading">Agents</div>
+          <a class="active" href="./pem.html"><span>◇</span><span><strong>Financials</strong><small>Reconcile billing &amp; invoices</small></span></a>
+          <a href="./alliance-manager/index.html?persona=eric&view=customer&v=109"><span>◇</span><span><strong>Customer</strong><small>Actions and insights</small></span></a>
+          <a href="./alliance-manager/index.html?persona=eric&view=benefits&v=109"><span>◇</span><span><strong>Benefits and designations</strong><small>Actions and insights</small></span></a>
+          <a href="#"><span>◇</span><span><strong>Administration</strong><small>Explore programs and manage accounts/users</small></span></a>
+        </nav>
+        <div class="history"><strong>CHAT HISTORY</strong><span>No chat history yet</span></div>
+      </aside>
+
+      <main class="pem-stage">
+        <div class="pem-context">
+          <div>
+            <a href="./index.html">← Back to Eric's home</a>
+            <span>Grow / Partner Economics Modeler</span>
+          </div>
+          <span id="screenCount">Screen 1 of 4</span>
+        </div>
+
+        <div class="pem-toolbar" role="tablist" aria-label="Partner Economics Modeler screens">
+          <button role="tab" data-screen="1" aria-selected="true">Frontier Accelerate</button>
+          <button role="tab" data-screen="2" aria-selected="false">CSP · Azure</button>
+          <button role="tab" data-screen="3" aria-selected="false">CSP · Modern Work &amp; Security</button>
+          <button role="tab" data-screen="4" aria-selected="false">Detailed metrics</button>
+        </div>
+
+        <section class="pem-screen" aria-live="polite">
+          <img id="pemImage" src="./experiences/pem/web/screen-1.png" alt="Partner Economics Modeler Frontier Accelerate screen" />
+        </section>
+
+        <div class="pem-controls">
+          <button id="previousScreen" type="button" disabled>← Previous</button>
+          <div class="pem-dots" aria-hidden="true">
+            <i class="active"></i><i></i><i></i><i></i>
+          </div>
+          <button id="nextScreen" class="primary" type="button">Next screen →</button>
+        </div>
+      </main>
+    </div>
+
+    <script src="./app.js?v=72"></script>
+    <script src="./pem.js"></script>
+  </body>
+</html>

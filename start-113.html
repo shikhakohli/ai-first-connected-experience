@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="AI-first connected Partner Center experience" />
+    <title>Partner Center | Fabrikam</title>
+    <link rel="stylesheet" href="./app.css?v=24" />
+  </head>
+  <body>
+    <header class="topbar">
+      <button class="icon-button menu-button" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="brand"><strong>Microsoft</strong> Partner Center</div>
+      <div class="search" role="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.4-4.4m2.4-5.1a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"/></svg>
+        <input aria-label="Search Partner Center" placeholder="Search" />
+      </div>
+      <div class="top-actions">
+        <button class="try-ai" type="button">Try AI first <span class="toggle"><i></i></span></button>
+        <button class="icon-button" aria-label="Notifications">○</button>
+        <div class="persona">
+          <button id="personaButton" class="avatar" aria-label="Account menu" aria-expanded="false">E</button>
+          <div id="personaMenu" class="persona-menu" hidden>
+            <div class="persona-current">
+              <strong id="currentPersonaName">Eric</strong>
+              <span id="currentPersonaRole">CFO · Fabrikam</span>
+            </div>
+            <button id="switchToEric" type="button" hidden>
+              <span class="small-avatar">E</span>
+              <span><strong>Eric</strong><small>CFO · Fabrikam</small></span>
+            </button>
+            <button id="switchToSarah" type="button">
+              <span class="small-avatar">S</span>
+              <span><strong>Sarah</strong><small>Alliance manager · United States</small></span>
+            </button>
+            <button id="switchToJane" type="button">
+              <span class="small-avatar jane-avatar">J</span>
+              <span><strong>Jane</strong><small>Growth lead · Journey Innovations</small></span>
+            </button>
+            <button id="switchToPaul" type="button">
+              <span class="small-avatar">P</span>
+              <span><strong>Paul</strong><small>Alliance manager · Apex Partners</small></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="rail" aria-label="Primary navigation">
+        <button class="new-chat">＋ <span>New chat</span></button>
+        <nav>
+          <a class="active" href="./"><span>⌂</span><span><strong>Home</strong><small>Overview and actions</small></span></a>
+          <div class="nav-heading">Agents</div>
+          <a href="#"><span>◇</span><span><strong>Financials</strong><small>Reconcile billing &amp; invoices</small></span></a>
+          <a id="customerNavLink" href="./alliance-manager/current-113.html?persona=eric&view=customer"><span>◇</span><span><strong>Customer</strong><small>Actions and insights</small></span></a>
+          <a href="./alliance-manager/current-113.html?persona=eric&view=benefits"><span>◇</span><span><strong>Benefits and designations</strong><small>Actions and insights</small></span></a>
+          <a href="#"><span>◇</span><span><strong>Administration</strong><small>Explore programs and manage accounts/users</small></span></a>
+        </nav>
+        <div class="history"><strong>CHAT HISTORY</strong><span>No chat history yet</span></div>
+      </aside>
+
+      <main id="main-content">
+        <section class="welcome">
+          <div>
+            <p id="today" class="eyebrow"></p>
+            <h1 id="welcomeTitle">Hi, Eric</h1>
+            <p id="welcomeSubtitle">Start with the insights that matter most to Fabrikam's growth.</p>
+          </div>
+          <div class="organization">
+            <span id="organizationLogo" class="org-logo">F</span>
+            <span><strong id="organizationName">Fabrikam</strong><small id="organizationRole">Chief Financial Officer</small></span>
+          </div>
+        </section>
+
+        <section id="ericCascadedGoal" class="eric-cascaded-goal" hidden>
+          <div class="cascaded-goal-icon">✓</div>
+          <div class="cascaded-goal-copy">
+            <span class="label">CASCADED ORGANIZATION GOAL</span>
+            <h2 id="ericCascadedGoalName"></h2>
+            <p id="ericCascadedGoalRoles"></p>
+            <div id="ericGoalEditor" class="eric-goal-editor" hidden>
+              <input id="ericGoalInput" aria-label="Edit cascaded goal" />
+              <button id="saveEricGoal" type="button">Save</button>
+              <button id="cancelEricGoal" type="button">Cancel</button>
+            </div>
+          </div>
+          <div class="eric-goal-actions">
+            <button id="editEricGoal" type="button">Edit goal</button>
+            <button id="removeEricGoal" type="button">Remove goal</button>
+            <a href="./partner-health.html?v=36">Review dashboard</a>
+          </div>
+        </section>
+
+        <section id="priorityBriefing" class="briefing">
+          <div class="briefing-icon">✦</div>
+          <div>
+            <span class="label">YOUR PRIORITY</span>
+            <h2 id="priorityTitle">Shape Fabrikam's FY27 growth plan</h2>
+            <p id="priorityDescription">Review performance against Microsoft's IPT targets, model the economics, and turn the plan into goals your organization can act on.</p>
+          </div>
+          <span class="step">1 of 3</span>
+        </section>
+
+        <div class="columns">
+          <section class="panel">
+            <div class="panel-heading">
+              <div><span class="section-icon grow-icon">↗</span><h2>Grow</h2><span id="growCount" class="count green">2</span></div>
+              <p id="growDescription">Plan revenue and align investment</p>
+            </div>
+
+            <article id="janeProposalCard" class="action-card featured proposal-card" hidden>
+              <div class="card-icon proposal-icon">✉</div>
+              <div class="card-copy">
+                <div class="card-meta">NEW BUSINESS OPPORTUNITY</div>
+                <h3>Fabrikam sent you a proposal</h3>
+                <p>Review Fabrikam's proposal to partner with Journey Innovations on a new customer growth opportunity.</p>
+                <div class="card-detail"><span class="status-dot"></span> Proposal received today</div>
+              </div>
+              <button id="reviewProposal" class="primary-action card-button" type="button">Review proposal <span>→</span></button>
+            </article>
+
+            <article class="action-card jane-grow-card" hidden>
+              <div class="card-icon migration-icon">↻</div>
+              <div class="card-copy">
+                <div class="card-meta">GROWTH POTENTIAL</div>
+                <h3>EA to CSP migrations</h3>
+                <p>Time-bound migration opportunities offering billing flexibility and stronger customer engagement.</p>
+                <div class="scenario-value"><span>Additional revenue potential</span><strong>€800K</strong></div>
+              </div>
+              <button class="secondary-action card-button jane-scenario-action" type="button" data-scenario="EA to CSP migration">View details <span>→</span></button>
+            </article>
+
+            <article class="action-card jane-grow-card" hidden>
+              <div class="card-icon pipeline-icon">▥</div>
+              <div class="card-copy">
+                <div class="card-meta">GROWTH POTENTIAL</div>
+                <h3>Pipeline Development</h3>
+                <p>High-propensity opportunities based on usage, readiness, and active pipeline signals.</p>
+                <div class="scenario-value"><span>Additional revenue potential</span><strong>€1.42M</strong></div>
+              </div>
+              <button class="secondary-action card-button jane-scenario-action" type="button" data-scenario="Pipeline Development">View details <span>→</span></button>
+            </article>
+
+            <article class="action-card featured eric-grow-card">
+              <div class="card-icon health-icon">▥</div>
+              <div class="card-copy">
+                <div class="card-meta">PERFORMANCE</div>
+                <h3>Partner Health Dashboard</h3>
+                <p>Review Fabrikam's performance across solution areas, measured against the IPT targets Microsoft has set.</p>
+                <div class="card-detail"><span class="status-dot"></span> FY27 performance data is ready</div>
+              </div>
+              <a class="primary-action" href="./partner-health.html?v=36">Review performance <span>→</span></a>
+            </article>
+
+            <article class="action-card eric-grow-card">
+              <div class="card-icon economics-icon">$</div>
+              <div class="card-copy">
+                <div class="card-meta">PLANNING</div>
+                <h3>Partner Economics Modeler</h3>
+                <p>Plan annual revenue goals and understand the margins and incentives Fabrikam could earn.</p>
+                <div class="card-detail"><span class="status-dot blue"></span> Model FY27 scenarios</div>
+              </div>
+              <a class="secondary-action" href="./pem.html">Open modeler <span>→</span></a>
+            </article>
+
+            <article id="goalCard" class="goal-card eric-grow-card">
+              <div class="goal-top">
+                <div class="card-icon goal-icon">◎</div>
+                <div>
+                  <div class="card-meta">NEXT STEP</div>
+                  <h3>Turn the plan into Fabrikam's FY27 goals</h3>
+                  <p>Cascade strategic intent across the organization and align every team to the same measures of success.</p>
+                </div>
+              </div>
+              <button id="setGoals" type="button">Set organization goals</button>
+            </article>
+          </section>
+
+          <section class="panel manage-panel">
+            <div class="panel-heading">
+              <div><span class="section-icon">⚙</span><h2>Manage</h2><span class="count">5</span></div>
+              <p>Keep your business healthy</p>
+            </div>
+
+            <article class="manage-item">
+              <span class="manage-icon">□</span>
+              <div><h3>Membership renewal coming up</h3><p>Partner Success Core expires in 45 days. Review auto-renewal settings.</p><span class="due">Due Sep 17</span></div>
+              <button>Review renewal</button>
+            </article>
+            <article class="manage-item">
+              <span class="manage-icon">✎</span>
+              <div><h3>Sign your MPA</h3><p>Review and sign the Microsoft Partner Agreement (Direct Bill).</p><span class="required">Action required</span></div>
+              <button>Sign MPA</button>
+            </article>
+            <article class="manage-item">
+              <span class="manage-icon">♙</span>
+              <div><h3>Assign MAICPP Admin to backup user</h3><p>Add a backup administrator for business continuity.</p><span class="recommended">Recommended</span></div>
+              <button>Assign role</button>
+            </article>
+            <article class="manage-item">
+              <span class="manage-icon">◇</span>
+              <div><h3>Update partner badges in Logo Builder</h3><p>Your Solutions Partner badge is available for marketing use.</p></div>
+              <button>Open Logo Builder</button>
+            </article>
+            <article class="manage-item">
+              <span class="manage-icon">◉</span>
+              <div><h3>Configure Action Center notifications</h3><p>Ensure admins receive critical compliance and renewal alerts.</p></div>
+              <button>Configure</button>
+            </article>
+          </section>
+        </div>
+
+        <section class="eric-ai" aria-label="Partner AI Assistant">
+          <div class="prompt-library">
+            <button id="promptLibraryButton" type="button" aria-expanded="false">
+              <span>✣</span> Prompt library <span class="chevron">⌄</span>
+            </button>
+            <div id="promptLibraryMenu" class="prompt-library-menu" hidden>
+              <button type="button">Summarize Fabrikam's performance against IPT targets</button>
+              <button type="button">Model the impact of our FY27 growth goals</button>
+              <button type="button">Where can Fabrikam improve margin and incentives?</button>
+              <button type="button">Prepare talking points for my next PDM review</button>
+            </div>
+          </div>
+          <form id="ericAiForm" class="eric-ai-composer">
+            <span class="eric-ai-icon">✣</span>
+            <input id="ericAiInput" aria-label="Ask Partner AI Assistant" placeholder="Ask questions and work with Partner AI Assistant" />
+            <button class="mic-button" type="button" aria-label="Use microphone">♩</button>
+            <button id="ericAiSend" class="send-button" type="submit" disabled><span>◁</span> Send</button>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <button class="copilot-fab" aria-label="Open Partner Center AI">✦</button>
+
+    <div id="goalModal" class="modal-backdrop" hidden>
+      <section class="modal goal-modal" role="dialog" aria-modal="true" aria-labelledby="goalTitle">
+        <div class="modal-header">
+          <div><span class="label">FABRIKAM · FY27</span><h2 id="goalTitle">Set organization goals</h2></div>
+          <button id="closeGoals" class="close" aria-label="Close">×</button>
+        </div>
+        <p class="modal-intro">Review every metric from Fabrikam's Partner Health Dashboard, then confirm the organization goals prepared from these insights and the modeled economics.</p>
+        <section class="goal-health-review" aria-label="Partner Health Dashboard metrics">
+          <div class="goal-health-heading">
+            <div><span class="label">PARTNER HEALTH DASHBOARD</span><h3>Performance informing Fabrikam's goals</h3></div>
+            <span id="goalMetricSummary">8 metrics · AI Business Solutions</span>
+          </div>
+          <div id="goalMetricTabs" class="goal-metric-tabs" role="tablist" aria-label="Solution areas">
+            <button type="button" role="tab" data-area="cloud" aria-selected="false">Cloud &amp; AI Platforms <span>4</span></button>
+            <button type="button" role="tab" data-area="business" aria-selected="true">AI Business Solutions <span>8</span></button>
+            <button type="button" role="tab" data-area="security" aria-selected="false">Security <span>4</span></button>
+          </div>
+          <div id="goalMetricGrid" class="goal-metric-grid"></div>
+        </section>
+        <div class="goal-divider"><span>FY27 ORGANIZATION GOALS</span></div>
+        <label class="goal-row">
+          <input type="checkbox" checked />
+          <span class="solution-dot purple"></span>
+          <span><strong>Modern Work &amp; Security</strong><small>Grow revenue by</small></span>
+          <strong class="goal-value">25%</strong>
+        </label>
+        <label class="goal-row">
+          <input type="checkbox" checked />
+          <span class="solution-dot azure"></span>
+          <span><strong>Azure</strong><small>Grow revenue by</small></span>
+          <strong class="goal-value">35%</strong>
+        </label>
+        <div class="share-plan"><span>↗</span><div><strong>Share as Fabrikam's organization plan</strong><p>Make these goals visible to alliance managers and other teams so they can create aligned market targets.</p></div></div>
+        <div class="modal-actions"><button id="cancelGoals">Cancel</button><button id="publishGoals" class="publish">Publish and cascade goals</button></div>
+      </section>
+    </div>
+
+    <div id="toast" class="toast" hidden><span>✓</span><div><strong>Fabrikam's FY27 goals are live</strong><p>Goals have been shared across the organization.</p></div></div>
+    <div id="aiToast" class="toast ai-toast" hidden><span>✣</span><div><strong>Partner AI Assistant</strong><p id="aiToastMessage"></p></div></div>
+    <script src="./app.js?v=79"></script>
+  </body>
+</html>

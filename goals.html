@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Set and cascade Fabrikam organization goals" />
+    <title>Organization Goals | Fabrikam</title>
+    <link rel="stylesheet" href="./app.css?v=22" />
+    <link rel="stylesheet" href="./goals.css?v=37" />
+  </head>
+  <body class="goals-page">
+    <header class="topbar">
+      <button class="icon-button menu-button" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="brand"><strong>Microsoft</strong> Partner Center</div>
+      <div class="search" role="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.4-4.4m2.4-5.1a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"/></svg>
+        <input aria-label="Search Partner Center" placeholder="Search" />
+      </div>
+      <div class="top-actions">
+        <button class="try-ai" type="button">Try AI first <span class="toggle"><i></i></span></button>
+        <button class="icon-button" aria-label="Notifications">○</button>
+        <div class="persona">
+          <button id="personaButton" class="avatar" aria-label="Account menu" aria-expanded="false">E</button>
+          <div id="personaMenu" class="persona-menu" hidden>
+            <div class="persona-current"><strong>Eric</strong><span>CFO · Fabrikam</span></div>
+            <button id="switchToSarah" type="button">
+              <span class="small-avatar">S</span>
+              <span><strong>Sarah</strong><small>Alliance manager · United States</small></span>
+            </button>
+            <button id="switchToJane" type="button">
+              <span class="small-avatar jane-avatar">J</span>
+              <span><strong>Jane</strong><small>Growth lead · Journey Innovations</small></span>
+            </button>
+            <button id="switchToPaul" type="button">
+              <span class="small-avatar">P</span>
+              <span><strong>Paul</strong><small>Alliance manager · Apex Partners</small></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="shell goals-shell">
+      <aside class="rail" aria-label="Primary navigation">
+        <button class="new-chat">＋ <span>New chat</span></button>
+        <nav>
+          <a href="./index.html"><span>⌂</span><span><strong>Home</strong><small>Overview and actions</small></span></a>
+          <div class="nav-heading">Agents</div>
+          <a href="#"><span>◇</span><span><strong>Financials</strong><small>Reconcile billing &amp; invoices</small></span></a>
+          <a href="./alliance-manager/index.html?persona=eric&view=customer&v=113"><span>◇</span><span><strong>Customer</strong><small>Actions and insights</small></span></a>
+          <a href="./alliance-manager/index.html?persona=eric&view=benefits&v=113"><span>◇</span><span><strong>Benefits and designations</strong><small>Actions and insights</small></span></a>
+          <a href="#"><span>◇</span><span><strong>Administration</strong><small>Explore programs and manage accounts/users</small></span></a>
+        </nav>
+        <div class="history"><strong>CHAT HISTORY</strong><span>FY27 organization planning</span></div>
+      </aside>
+
+      <main class="goals-chat">
+        <header class="goals-chat-header">
+          <a href="./index.html">← Home</a>
+          <div class="goals-agent-title"><span>✣</span><div><strong>Partner AI Assistant</strong><small>Fabrikam organization planning</small></div></div>
+          <button type="button">⋯</button>
+        </header>
+
+        <div id="goalsThread" class="goals-thread">
+          <article class="chat-message assistant-message">
+            <span class="chat-avatar">✣</span>
+            <div class="chat-content">
+              <p>Hi Eric. I’ve brought together Fabrikam’s Partner Health Dashboard results across every solution area so we can turn performance into an actionable FY27 plan.</p>
+              <section class="goal-health-review full-page-health" aria-label="Partner Health Dashboard metrics">
+                <div class="goal-health-heading">
+                  <div><span class="label">PARTNER HEALTH DASHBOARD</span><h3>Performance informing Fabrikam's goals</h3></div>
+                  <span id="goalMetricSummary">8 metrics · AI Business Solutions</span>
+                </div>
+                <div id="goalMetricTabs" class="goal-metric-tabs" role="tablist" aria-label="Solution areas">
+                  <button type="button" role="tab" data-area="cloud" aria-selected="false">Cloud &amp; AI Platforms <span>4</span></button>
+                  <button type="button" role="tab" data-area="business" aria-selected="true">AI Business Solutions <span>8</span></button>
+                  <button type="button" role="tab" data-area="security" aria-selected="false">Security <span>4</span></button>
+                </div>
+                <div id="goalMetricGrid" class="goal-metric-grid"></div>
+              </section>
+            </div>
+          </article>
+
+          <article class="chat-message assistant-message">
+            <span class="chat-avatar">✣</span>
+            <div class="chat-content">
+              <p>Each tile across the three solution areas can become a Fabrikam organization goal. Select any combination above, then publish and cascade the chosen goals.</p>
+              <div class="selected-goals-summary">
+                <div><strong id="selectedGoalCount">No goals selected</strong><span>Your selections are retained as you move between solution areas.</span></div>
+                <div id="selectedGoalList" class="selected-goal-list"><span class="empty-selection">Select a tile to add it to the plan</span></div>
+              </div>
+              <div class="cascade-plan">
+                <div><span>↗</span><div><strong>Cascade across Fabrikam</strong><p>Share the goals with market and role owners and invite them to create aligned targets.</p></div></div>
+                <div id="cascadeAudience" class="cascade-audience" aria-label="Roles receiving these goals">
+                  <label><input type="checkbox" value="Alliance managers" checked /><span>✓</span>Alliance managers</label>
+                  <label><input type="checkbox" value="Sales leaders" checked /><span>✓</span>Sales leaders</label>
+                  <label><input type="checkbox" value="Solution-area owners" checked /><span>✓</span>Solution-area owners</label>
+                  <label><input type="checkbox" value="Finance" checked /><span>✓</span>Finance</label>
+                </div>
+              </div>
+              <button id="cascadeGoals" class="cascade-button" type="button" disabled>Select at least one goal</button>
+            </div>
+          </article>
+
+          <article id="cascadeConfirmation" class="chat-message assistant-message cascade-confirmation" hidden>
+            <span class="chat-avatar success">✓</span>
+            <div class="chat-content">
+              <div class="confirmation-title"><strong>Fabrikam’s FY27 goals are live</strong><span>Published by Eric · CFO</span></div>
+              <p id="cascadeConfirmationText">The goals have been shared with the selected roles. Each recipient can now translate the company ambition into a focused market or role target.</p>
+              <div class="organization-handoff">
+                <span>↗</span>
+                <div><strong>Organization-wide cascade complete</strong><p id="cascadeRoleSummary">Recipients can now create aligned goals for their markets, teams, and solution areas.</p></div>
+              </div>
+              <a class="return-plan" href="./index.html">Return to Eric’s homepage</a>
+            </div>
+          </article>
+        </div>
+
+        <form class="goals-composer">
+          <span>✣</span>
+          <input aria-label="Ask Partner AI Assistant" placeholder="Ask about performance, goals, or the cascade plan" />
+          <button type="button" aria-label="Use microphone">♩</button>
+          <button type="submit">Send</button>
+        </form>
+      </main>
+    </div>
+
+    <script src="./app.js?v=79"></script>
+    <script src="./goals.js?v=35"></script>
+  </body>
+</html>

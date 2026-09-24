@@ -1,0 +1,173 @@
+.pem-page {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.pem-shell {
+  height: calc(100vh - 44px);
+}
+
+.pem-stage {
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  background: #f5f5f6;
+}
+
+.pem-context {
+  min-height: 38px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex: 0 0 auto;
+  color: #717171;
+  background: #fafafa;
+  border-bottom: 1px solid #e5e5e5;
+  font-size: 11px;
+}
+
+.pem-context > div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.pem-context a {
+  color: #5a287d;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.pem-context a:hover {
+  text-decoration: underline;
+}
+
+.pem-context > span {
+  color: #666;
+  font-weight: 600;
+}
+
+.pem-toolbar {
+  padding: 10px 20px 0;
+  display: flex;
+  gap: 4px;
+  flex: 0 0 auto;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+.pem-toolbar button {
+  padding: 9px 13px 10px;
+  color: #555;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.pem-toolbar button:hover {
+  color: #242424;
+  background: #fafafa;
+}
+
+.pem-toolbar button[aria-selected="true"] {
+  color: #5a287d;
+  border-bottom-color: #7b40b4;
+}
+
+.pem-screen {
+  min-height: 0;
+  margin: 12px 20px 8px;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px #00000012;
+}
+
+.pem-screen img {
+  width: 100%;
+  height: auto;
+  align-self: flex-start;
+  object-fit: contain;
+  background: #fff;
+}
+
+.pem-controls {
+  min-height: 52px;
+  padding: 7px 20px 11px;
+  display: grid;
+  grid-template-columns: 120px 1fr 120px;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.pem-controls button {
+  padding: 7px 10px;
+  color: #4d4d4d;
+  background: #fff;
+  border: 1px solid #c8c8c8;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.pem-controls button:last-child {
+  justify-self: end;
+}
+
+.pem-controls button.primary {
+  color: #fff;
+  background: #6b36a0;
+  border-color: #6b36a0;
+}
+
+.pem-controls button:disabled {
+  color: #aaa;
+  background: #eee;
+  border-color: #ddd;
+  cursor: default;
+}
+
+.pem-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.pem-dots i {
+  width: 6px;
+  height: 6px;
+  background: #c7c7c7;
+  border-radius: 50%;
+}
+
+.pem-dots i.active {
+  width: 16px;
+  background: #7b40b4;
+  border-radius: 3px;
+}
+
+@media (max-width: 900px) {
+  .pem-toolbar {
+    overflow-x: auto;
+  }
+
+  .pem-toolbar button {
+    white-space: nowrap;
+  }
+
+  .pem-screen {
+    margin-inline: 10px;
+  }
+}
