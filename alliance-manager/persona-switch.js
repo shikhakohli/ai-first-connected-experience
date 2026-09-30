@@ -35,7 +35,7 @@
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
   const sarahCompletedTransactionsKey = "fabrikam-sarah-completed-transactions";
-  const buildVersion = "151";
+  const buildVersion = "154";
   let janeDistributorFilter = "All distributors";
   let openCurrentProposalWorkspace = null;
 
@@ -682,7 +682,6 @@
         (sum, transaction) => sum + Number(transaction.seats || 0),
         0,
       );
-      const showNpsaProgress = !copilotNpsaTarget || completedNpsaSeats > 0;
       const currentNpsaSeats = targetNpsaSeats
         ? targetNpsaSeats * 0.54 + completedNpsaSeats
         : 0;
@@ -690,7 +689,7 @@
         ? Math.round((currentNpsaSeats / targetNpsaSeats) * 100)
         : 0;
       const formatSeats = (value) => Math.round(value).toLocaleString("en-US");
-      const progressMarkup = copilotNpsaTarget && showNpsaProgress
+      const progressMarkup = copilotNpsaTarget
         ? `
           <div class="demo-active-progress">
             <div><span>Copilot net paid seats (NPSA)</span><strong>${npsaProgress}% to goal</strong></div>
@@ -733,7 +732,7 @@
           <div>
             <span>🎯</span>
             <div>
-              <strong>${showNpsaProgress ? `Progress towards set goal${activeGoals.length === 1 ? "" : "s"}` : "Goal applied to customer portfolio"}</strong>
+              <strong>Progress towards set goal${activeGoals.length === 1 ? "" : "s"}</strong>
               <p>${activeGoals.length === 1 ? activeGoals[0] : `${activeGoals.length} goals applied to this portfolio`}</p>
             </div>
           </div>
@@ -743,7 +742,7 @@
           ${hasFabrikamGoal ? `<span><strong>Organization goal:</strong> ${createGoalSummary(plan.goals)}</span>` : ""}
           ${choice === "own" ? `<span><strong>Custom goal:</strong> ${goal}</span>` : ""}
         </div>
-        <div class="demo-active-progress-list" ${progressMarkup ? "" : "hidden"}>
+        <div class="demo-active-progress-list">
           ${progressMarkup}
         </div>
         <div class="demo-active-goal-details">
@@ -2202,7 +2201,7 @@
               <span>Percentage and total dollar benefit</span>
             </div>
             <div class="demo-benefit-rate-table">
-              <div><span>Promotion</span><label><input data-field="promotion" type="number" min="0" max="100" step="0.1" value="15" readonly /><b>%</b></label><output data-benefit="promotion"></output></div>
+              <div><span>Promotion</span><strong>15%</strong><output data-benefit="promotion"></output></div>
             </div>
           </section>
           <section class="demo-deal-section">
@@ -2228,7 +2227,7 @@
               <div><span>Core · FY27</span><strong data-incentive-rate-label="core">2%</strong><output data-incentive="core"></output></div>
               <div class="demo-strategic-tier-row">
                 <span>Global Strategic Product Accelerator · FY27</span>
-                <label><select data-field="strategic-tier" disabled><option value="tier1">Tier 1</option><option value="tier2" selected>Tier 2</option></select><strong>7.5%</strong></label>
+                <strong>Tier 2 · 7.5%</strong>
                 <output data-incentive="strategic"></output>
               </div>
               <div><span>Growth Accelerator · FY27</span><strong>10%</strong><output data-incentive="growth"></output></div>
@@ -2483,14 +2482,7 @@
           const seats = Math.max(1, Number(seatField.value || 0));
           if (Number(seatField.value) !== seats) seatField.value = String(seats);
           const dealBase = partnerPrice * seats;
-          const promotionField = benefitField("promotion");
-          const promotionRate = Math.min(
-            100,
-            Math.max(0, Number(promotionField.value || 0)),
-          );
-          if (Number(promotionField.value) !== promotionRate) {
-            promotionField.value = String(promotionRate);
-          }
+          const promotionRate = 15;
           const promotionTotal = dealBase * (promotionRate / 100);
           const marginAmounts = {
             "new-offer": dealBase * 0.03,
@@ -2582,7 +2574,7 @@
         };
 
         editor.querySelectorAll(
-          '[data-field="erp-price"], [data-field="partner-price"], [data-field="whitespace"], [data-field="promotion"], [data-field="cocp"], [data-field="strategic-tier"]',
+          '[data-field="erp-price"], [data-field="partner-price"], [data-field="whitespace"], [data-field="cocp"]',
         ).forEach((input) => {
           input.addEventListener("input", updateBenefitCalculator);
           input.addEventListener("change", updateBenefitCalculator);
