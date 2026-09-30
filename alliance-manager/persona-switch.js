@@ -2019,6 +2019,7 @@
       const quantityText = facts.find((fact) => fact.textContent.includes("Recommended quantity"))
         ?.querySelector("strong")?.textContent || "0";
       const whitespace = Number(quantityText.replaceAll(",", ""));
+      const usesBenefitSharing = !isEric && !isJane;
       const suggestedEndDate = new Date();
       suggestedEndDate.setFullYear(suggestedEndDate.getFullYear() + 1);
       const editor = document.createElement("div");
@@ -2031,50 +2032,120 @@
           <button type="button" data-action="collapse-deal">Collapse deal details</button>
         </div>
         <p>Edit the commercial assumptions below. Final cost and incentives update automatically.</p>
-        <div class="demo-deal-fields">
-          <label class="demo-sku-field">SKU details
-            <div class="demo-sku-search">
-              <span>⌕</span>
-              <input data-field="sku" role="combobox" aria-label="Search SKU details" aria-expanded="false" aria-controls="demo-sku-options" value="Microsoft 365 Copilot" autocomplete="off" />
-              <button type="button" aria-label="Clear SKU search">×</button>
+        ${usesBenefitSharing ? `
+          <div class="demo-deal-fields demo-benefit-price-fields">
+            <label>ERP price per seat ($)<input data-field="erp-price" type="number" min="0" step="0.01" value="21.84" readonly /></label>
+            <label>Microsoft partner price per seat ($)<input data-field="partner-price" type="number" min="0" step="0.01" value="17.48" /></label>
+            <label>Seat count<input data-field="whitespace" type="number" min="1" step="1" value="${whitespace}" /></label>
+          </div>
+          <section class="demo-deal-section">
+            <div class="demo-deal-section-title">
+              <h5>Promotion</h5>
+              <span>Percentage and total dollar benefit</span>
             </div>
-            <div class="demo-sku-options" id="demo-sku-options" role="listbox" hidden></div>
-          </label>
-          ${isJane ? '<label>Distributor name<input data-field="distributor" value="Fabrikam" readonly /></label>' : ""}
-          <label>List price<input data-field="list" type="number" min="0" step="0.01" value="21.84" /></label>
-          <label>Promotion percent<input data-field="promotion" type="number" min="0" max="100" step="0.1" value="15" /></label>
-          ${isJane ? '<label>Billing frequency<select data-field="billing"><option selected>Monthly</option><option>Annual</option></select></label>' : ""}
-          ${isJane ? `<label>Subscription end date<input data-field="end-date" type="date" value="${suggestedEndDate.toISOString().slice(0, 10)}" /></label>` : ""}
-          ${isJane ? '<label>Term duration<select data-field="term"><option selected>P1Y annual term</option><option>P3Y three-year term</option></select></label>' : ""}
-          ${isJane ? "" : '<label>Growth margin (%)<input data-field="margin" type="number" min="0" max="100" step="1" value="20" /></label>'}
-          <label>Discounted final price<input data-field="discounted" type="number" min="0" step="0.01" readonly /></label>
-          ${isJane ? "" : '<label>Partner Earned Credit (15%)<output data-field="pec"></output></label>'}
-          ${isJane ? "" : '<label>Is COCP applicable?<select data-field="cocp"><option selected>Yes</option><option>No</option></select></label>'}
-          <label>Seat count<input data-field="whitespace" type="number" min="0" step="1" value="${whitespace}" /></label>
-          <label class="demo-final-cost">Final cost <small>Seat count × discounted final price</small><output data-field="opportunity"></output></label>
-        </div>
-        <section class="demo-deal-section">
-          <div class="demo-deal-section-title">
-            <h5>Incentives</h5>
-            <span>Calculated on final cost after promotion and growth margin</span>
+            <div class="demo-benefit-rate-table">
+              <div><span>Promotion</span><label><input data-field="promotion" type="number" min="0" max="100" step="0.1" value="15" /><b>%</b></label><output data-benefit="promotion"></output></div>
+            </div>
+          </section>
+          <section class="demo-deal-section">
+            <div class="demo-deal-section-title">
+              <h5>Margin</h5>
+              <span>Eligible FY27 margin components</span>
+            </div>
+            <div class="demo-benefit-rate-table">
+              <div><span>New-to-Offer Eligible Margin · FY27</span><strong>3%</strong><output data-margin="new-offer"></output></div>
+              <div><span>Seat Expansion Eligible Margin · FY27</span><strong>4%</strong><output data-margin="seat-expansion"></output></div>
+              <div><span>Strategic SKU Mix Eligible Margin · FY27</span><strong>3%</strong><output data-margin="strategic-sku"></output></div>
+            </div>
+          </section>
+          <section class="demo-deal-section">
+            <div class="demo-deal-section-title">
+              <h5>Incentives</h5>
+              <span>Program percentages are fixed and not editable</span>
+            </div>
+            <label class="demo-cocp-field">Is COCP applicable?
+              <select data-field="cocp"><option selected>No</option><option>Yes</option></select>
+            </label>
+            <div class="demo-benefit-rate-table">
+              <div><span>Core · FY27</span><strong data-incentive-rate-label="core">2%</strong><output data-incentive="core"></output></div>
+              <div class="demo-strategic-tier-row">
+                <span>Global Strategic Product Accelerator · FY27</span>
+                <label><select data-field="strategic-tier"><option value="tier1">Tier 1</option><option value="tier2" selected>Tier 2</option></select><strong>7.5%</strong></label>
+                <output data-incentive="strategic"></output>
+              </div>
+              <div><span>Growth Accelerator · FY27</span><strong>10%</strong><output data-incentive="growth"></output></div>
+            </div>
+          </section>
+          <section class="demo-deal-section demo-benefit-sharing-section">
+            <div class="demo-deal-section-title">
+              <h5>Benefit sharing</h5>
+              <span>Choose how much to keep versus pass through to the ${isPaul ? "customer" : "reseller"}</span>
+            </div>
+            <div class="demo-benefit-sharing">
+              ${[
+                ["promotion", "Promotion total"],
+                ["margin", "Margin total"],
+                ["incentives", "Incentives total"],
+                ["total", "Total benefits"],
+              ].map(([key, label]) => `
+                <div class="${key === "total" ? "total" : ""}" data-benefit-share-row="${key}">
+                  <div><strong>${label}</strong><output data-benefit-total="${key}"></output></div>
+                  <input type="range" min="0" max="100" step="1" value="50" data-benefit-share="${key}" aria-label="${label} percentage kept by partner" />
+                  <small><span data-benefit-kept="${key}"></span><span data-benefit-passed="${key}"></span></small>
+                </div>
+              `).join("")}
+            </div>
+            <div class="demo-benefit-final-values">
+              <div><span>Offered price per seat</span><strong data-benefit-result="offered-price"></strong></div>
+              <div><span>Final deal size</span><strong data-benefit-result="deal-size"></strong></div>
+            </div>
+          </section>
+        ` : `
+          <div class="demo-deal-fields">
+            <label class="demo-sku-field">SKU details
+              <div class="demo-sku-search">
+                <span>⌕</span>
+                <input data-field="sku" role="combobox" aria-label="Search SKU details" aria-expanded="false" aria-controls="demo-sku-options" value="Microsoft 365 Copilot" autocomplete="off" />
+                <button type="button" aria-label="Clear SKU search">×</button>
+              </div>
+              <div class="demo-sku-options" id="demo-sku-options" role="listbox" hidden></div>
+            </label>
+            ${isJane ? '<label>Distributor name<input data-field="distributor" value="Fabrikam" readonly /></label>' : ""}
+            <label>List price<input data-field="list" type="number" min="0" step="0.01" value="21.84" /></label>
+            <label>Promotion percent<input data-field="promotion" type="number" min="0" max="100" step="0.1" value="15" /></label>
+            ${isJane ? '<label>Billing frequency<select data-field="billing"><option selected>Monthly</option><option>Annual</option></select></label>' : ""}
+            ${isJane ? `<label>Subscription end date<input data-field="end-date" type="date" value="${suggestedEndDate.toISOString().slice(0, 10)}" /></label>` : ""}
+            ${isJane ? '<label>Term duration<select data-field="term"><option selected>P1Y annual term</option><option>P3Y three-year term</option></select></label>' : ""}
+            ${isJane ? "" : '<label>Growth margin (%)<input data-field="margin" type="number" min="0" max="100" step="1" value="20" /></label>'}
+            <label>Discounted final price<input data-field="discounted" type="number" min="0" step="0.01" readonly /></label>
+            ${isJane ? "" : '<label>Partner Earned Credit (15%)<output data-field="pec"></output></label>'}
+            ${isJane ? "" : '<label>Is COCP applicable?<select data-field="cocp"><option>No</option><option>Yes</option></select></label>'}
+            <label>Seat count<input data-field="whitespace" type="number" min="0" step="1" value="${whitespace}" /></label>
+            <label class="demo-final-cost">Final cost <small>Seat count × discounted final price</small><output data-field="opportunity"></output></label>
           </div>
-          <div class="demo-incentive-table">
-            <div><span>Core incentive${isJane ? " (reseller)" : ""}</span><label><input data-incentive-rate="core" type="number" min="0" max="100" step="0.1" value="2.5" /><b>%</b></label><output data-incentive="core"></output></div>
-            <div><span>Global strategic tier 2${isJane ? " (reseller)" : ""}</span><label><input data-incentive-rate="strategic" type="number" min="0" max="100" step="0.1" value="7" /><b>%</b></label><output data-incentive="strategic"></output></div>
-            <div><span>Growth accelerator${isJane ? " (reseller)" : ""}</span><label><input data-incentive-rate="growth" type="number" min="0" max="100" step="0.1" value="10" /><b>%</b></label><output data-incentive="growth"></output></div>
-          </div>
-        </section>
-        <section class="demo-deal-section">
-          <div class="demo-deal-section-title">
-            <h5>Benefits eligible</h5>
-            <span>Included with this opportunity</span>
-          </div>
-          <div class="demo-benefit-list">
-            <span>✓ Copilot adoption workshop</span>
-            <span>✓ Customer success accelerators</span>
-            <span>✓ Deployment and enablement guidance</span>
-          </div>
-        </section>
+          <section class="demo-deal-section">
+            <div class="demo-deal-section-title">
+              <h5>Incentives</h5>
+              <span>Calculated on final cost after promotion and growth margin</span>
+            </div>
+            <div class="demo-incentive-table">
+              <div><span>Core incentive${isJane ? " (reseller)" : ""}</span><label><input data-incentive-rate="core" type="number" min="0" max="100" step="0.1" value="2.5" /><b>%</b></label><output data-incentive="core"></output></div>
+              <div><span>Global strategic tier 2${isJane ? " (reseller)" : ""}</span><label><input data-incentive-rate="strategic" type="number" min="0" max="100" step="0.1" value="7" /><b>%</b></label><output data-incentive="strategic"></output></div>
+              <div><span>Growth accelerator${isJane ? " (reseller)" : ""}</span><label><input data-incentive-rate="growth" type="number" min="0" max="100" step="0.1" value="10" /><b>%</b></label><output data-incentive="growth"></output></div>
+            </div>
+          </section>
+          <section class="demo-deal-section">
+            <div class="demo-deal-section-title">
+              <h5>Benefits eligible</h5>
+              <span>Included with this opportunity</span>
+            </div>
+            <div class="demo-benefit-list">
+              <span>✓ Copilot adoption workshop</span>
+              <span>✓ Customer success accelerators</span>
+              <span>✓ Deployment and enablement guidance</span>
+            </div>
+          </section>
+        `}
         <div class="demo-deal-actions">
           ${sentProposal ? '<button type="button" data-action="sent-proposal">See sent proposal</button>' : ""}
           <button type="button" data-action="proposal" ${sentProposal && isJane ? "hidden" : ""}>${isJane ? "Create proposal" : isPaul ? sentProposal ? "Send revised proposal" : "Send proposal to customer" : "Create proposal for reseller"}</button>
@@ -2087,6 +2158,201 @@
         editor.remove();
         card.scrollIntoView({ behavior: "smooth", block: "center" });
       });
+      if (usesBenefitSharing) {
+        const benefitField = (name) => editor.querySelector(`[data-field="${name}"]`);
+        const usd = new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        });
+        const categoryKeys = ["promotion", "margin", "incentives"];
+        const sharingTarget = isPaul ? "customer" : "reseller";
+
+        const updateBenefitCalculator = () => {
+          const partnerPrice = Number(benefitField("partner-price").value || 0);
+          const seatField = benefitField("whitespace");
+          const seats = Math.max(1, Number(seatField.value || 0));
+          if (Number(seatField.value) !== seats) seatField.value = String(seats);
+          const dealBase = partnerPrice * seats;
+          const promotionField = benefitField("promotion");
+          const promotionRate = Math.min(
+            100,
+            Math.max(0, Number(promotionField.value || 0)),
+          );
+          if (Number(promotionField.value) !== promotionRate) {
+            promotionField.value = String(promotionRate);
+          }
+          const promotionTotal = dealBase * (promotionRate / 100);
+          const marginAmounts = {
+            "new-offer": dealBase * 0.03,
+            "seat-expansion": dealBase * 0.04,
+            "strategic-sku": dealBase * 0.03,
+          };
+          const marginTotal = Object.values(marginAmounts)
+            .reduce((sum, value) => sum + value, 0);
+          const cocpApplies = benefitField("cocp").value === "Yes";
+          const coreRate = cocpApplies ? 0 : 0.02;
+          const incentiveAmounts = {
+            core: dealBase * coreRate,
+            strategic: dealBase * 0.075,
+            growth: dealBase * 0.10,
+          };
+          const incentivesTotal = Object.values(incentiveAmounts)
+            .reduce((sum, value) => sum + value, 0);
+          const totals = {
+            promotion: promotionTotal,
+            margin: marginTotal,
+            incentives: incentivesTotal,
+          };
+          const totalBenefits = Object.values(totals)
+            .reduce((sum, value) => sum + value, 0);
+
+          editor.querySelector('[data-benefit="promotion"]').textContent =
+            usd.format(promotionTotal);
+          Object.entries(marginAmounts).forEach(([key, value]) => {
+            editor.querySelector(`[data-margin="${key}"]`).textContent = usd.format(value);
+          });
+          Object.entries(incentiveAmounts).forEach(([key, value]) => {
+            editor.querySelector(`[data-incentive="${key}"]`).textContent = usd.format(value);
+          });
+          editor.querySelector('[data-incentive-rate-label="core"]').textContent =
+            `${coreRate * 100}%`;
+
+          let retainedTotal = 0;
+          let passedTotal = 0;
+          categoryKeys.forEach((key) => {
+            const amount = totals[key];
+            const keptPercent = Number(
+              editor.querySelector(`[data-benefit-share="${key}"]`).value,
+            );
+            const kept = amount * (keptPercent / 100);
+            const passed = amount - kept;
+            retainedTotal += kept;
+            passedTotal += passed;
+            editor.querySelector(`[data-benefit-total="${key}"]`).textContent =
+              usd.format(amount);
+            editor.querySelector(`[data-benefit-kept="${key}"]`).textContent =
+              `Partner keeps ${keptPercent}% · ${usd.format(kept)}`;
+            editor.querySelector(`[data-benefit-passed="${key}"]`).textContent =
+              `Passes ${100 - keptPercent}% · ${usd.format(passed)} to ${sharingTarget}`;
+          });
+
+          const totalKeptPercent = totalBenefits
+            ? Math.round((retainedTotal / totalBenefits) * 100)
+            : Math.round(
+              categoryKeys.reduce(
+                (sum, key) =>
+                  sum + Number(editor.querySelector(`[data-benefit-share="${key}"]`).value),
+                0,
+              ) / categoryKeys.length,
+            );
+          const totalSlider = editor.querySelector('[data-benefit-share="total"]');
+          totalSlider.value = totalKeptPercent;
+          editor.querySelector('[data-benefit-total="total"]').textContent =
+            usd.format(totalBenefits);
+          editor.querySelector('[data-benefit-kept="total"]').textContent =
+            `Partner keeps ${totalKeptPercent}% · ${usd.format(retainedTotal)}`;
+          editor.querySelector('[data-benefit-passed="total"]').textContent =
+            `Passes ${100 - totalKeptPercent}% · ${usd.format(passedTotal)} to ${sharingTarget}`;
+
+          const offeredPrice = Math.max(0, partnerPrice - passedTotal / seats);
+          const finalDealSize = offeredPrice * seats;
+          editor.querySelector('[data-benefit-result="offered-price"]').textContent =
+            `${usd.format(offeredPrice)} per seat`;
+          editor.querySelector('[data-benefit-result="deal-size"]').textContent =
+            usd.format(finalDealSize);
+          editor.dataset.offeredPrice = offeredPrice.toFixed(2);
+          editor.dataset.dealSize = finalDealSize.toFixed(2);
+          editor.dataset.seats = String(seats);
+        };
+
+        editor.querySelectorAll(
+          '[data-field="erp-price"], [data-field="partner-price"], [data-field="whitespace"], [data-field="promotion"], [data-field="cocp"], [data-field="strategic-tier"]',
+        ).forEach((input) => {
+          input.addEventListener("input", updateBenefitCalculator);
+          input.addEventListener("change", updateBenefitCalculator);
+        });
+        categoryKeys.forEach((key) => {
+          editor.querySelector(`[data-benefit-share="${key}"]`).addEventListener(
+            "input",
+            updateBenefitCalculator,
+          );
+        });
+        editor.querySelector('[data-benefit-share="total"]').addEventListener("input", (event) => {
+          categoryKeys.forEach((key) => {
+            editor.querySelector(`[data-benefit-share="${key}"]`).value =
+              event.currentTarget.value;
+          });
+          updateBenefitCalculator();
+        });
+
+        editor.querySelector('[data-action="proposal"]').addEventListener("click", () => {
+          openGcpsProposalWorkspace({
+            customer,
+            opportunitySize: usd.format(Number(editor.dataset.dealSize)),
+            seatCount: Number(editor.dataset.seats).toLocaleString(),
+            unitPrice: usd.format(Number(editor.dataset.offeredPrice)),
+            product: "Microsoft 365 Copilot",
+          });
+        });
+        editor.querySelector('[data-action="transact"]').addEventListener("click", () => {
+          const status = editor.querySelector(".demo-transaction-status");
+          const offeredPrice = Number(editor.dataset.offeredPrice);
+          const seats = Number(editor.dataset.seats);
+          status.innerHTML = `
+            <div class="demo-user-prompt">Transact this Copilot opportunity for ${customer}</div>
+            <div class="demo-ai-label">✣ <strong>Partner Agent</strong> <span>Purchase review</span></div>
+            <h4>Review transaction details</h4>
+            <p>Review the benefit-adjusted offer before purchasing.</p>
+            <div class="demo-transaction-fields">
+              <label>Customer name<input data-transaction-field="customer" value="${customer}" /></label>
+              ${isPaul ? "" : '<label>Reseller name<input data-transaction-field="reseller" value="Journey Innovations" /></label>'}
+              <label>SKU selected<input data-transaction-field="sku" value="Microsoft 365 Copilot" readonly /></label>
+              <label>Offered price per seat (USD)<input data-transaction-field="price" type="number" min="0" step="0.01" value="${offeredPrice.toFixed(2)}" /></label>
+              <label>Seats<input data-transaction-field="seats" type="number" min="1" step="1" value="${seats}" /></label>
+              <label>Final deal size<output data-transaction-field="total"></output></label>
+            </div>
+            <div class="demo-transaction-actions">
+              <button type="button" data-transaction-action="purchase">Purchase</button>
+              <button type="button" data-transaction-action="cancel">Cancel</button>
+            </div>
+            <p class="demo-purchase-ready" hidden></p>
+          `;
+          status.hidden = false;
+          const transactionField = (name) =>
+            status.querySelector(`[data-transaction-field="${name}"]`);
+          const updateTransactionTotal = () => {
+            transactionField("total").textContent = usd.format(
+              Number(transactionField("seats").value || 0)
+                * Number(transactionField("price").value || 0),
+            );
+          };
+          transactionField("seats").addEventListener("input", updateTransactionTotal);
+          transactionField("price").addEventListener("input", updateTransactionTotal);
+          status.querySelector('[data-transaction-action="purchase"]').addEventListener(
+            "click",
+            () => {
+              const ready = status.querySelector(".demo-purchase-ready");
+              ready.textContent =
+                `Purchase confirmed for ${transactionField("customer").value}: `
+                + `${transactionField("seats").value} Microsoft 365 Copilot seats `
+                + `at ${usd.format(Number(transactionField("price").value || 0))} per seat.`;
+              ready.hidden = false;
+            },
+          );
+          status.querySelector('[data-transaction-action="cancel"]').addEventListener(
+            "click",
+            () => {
+              status.hidden = true;
+            },
+          );
+          updateTransactionTotal();
+          status.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
+        updateBenefitCalculator();
+        editor.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
       const field = (name) => editor.querySelector(`[data-field="${name}"]`);
       const skuOptions = [
         "Microsoft 365 Copilot",
