@@ -35,7 +35,7 @@
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
   const sarahCompletedTransactionsKey = "fabrikam-sarah-completed-transactions";
-  const buildVersion = "156";
+  const buildVersion = "157";
   let janeDistributorFilter = "All distributors";
   let openCurrentProposalWorkspace = null;
 
