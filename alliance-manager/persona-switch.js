@@ -442,7 +442,7 @@
           <strong>Apply goals to your portfolio</strong>
           <p>${hasFabrikamGoal
             ? "Choose how these goals should guide your United States customer portfolio."
-            : `Set a goal for your ${isPaul ? "Apex Partners" : "United States"} customer portfolio so Partner AI can align insights and recommendations.`}</p>
+            : `Set a goal for your ${isPaul ? "Apex Partners" : "United States"} customer portfolio so Partner Agent can align insights and recommendations.`}</p>
         </div>
       </div>
       <div class="demo-inherited-goals"></div>
@@ -454,7 +454,7 @@
       <div class="demo-own-goal-editor" hidden>
         <div>
           <strong>Set your custom goal</strong>
-          <p>Tell Partner AI what success looks like — insights and recommendations will align to your goal.</p>
+          <p>Tell Partner Agent what success looks like — insights and recommendations will align to your goal.</p>
         </div>
         <div class="demo-own-goal-input">
           <textarea rows="2" placeholder="e.g. Grow Copilot paid seats by 30% and reduce renewal risk to under €50K by Q3 2026…"></textarea>
@@ -545,6 +545,49 @@
           ? [...plan.goals, goal]
           : [goal];
       const progressLevels = [87, 74, 92, 68, 81];
+      const copilotNpsaTarget = choice === "accepted"
+        ? plan?.goalTargets?.find(
+          (target) => /copilot/i.test(target.name)
+            && /(NPSA|Net Paid Seat Adds)/i.test(target.name),
+        )
+        : null;
+      const parseSeatValue = (value) =>
+        Number(String(value ?? "").replaceAll(/[^0-9.-]/g, "")) || 0;
+      const currentNpsaSeats = parseSeatValue(copilotNpsaTarget?.sourceValue);
+      const targetNpsaSeats = parseSeatValue(copilotNpsaTarget?.value);
+      const npsaProgress = targetNpsaSeats
+        ? Math.round((currentNpsaSeats / targetNpsaSeats) * 100)
+        : 0;
+      const formatSeats = (value) => Math.round(value).toLocaleString("en-US");
+      const progressMarkup = copilotNpsaTarget
+        ? `
+          <div class="demo-active-progress">
+            <div><span>Copilot net paid seats (NPSA)</span><strong>${npsaProgress}% to goal</strong></div>
+            <div class="demo-active-progress-track"><i style="width:${Math.min(npsaProgress, 100)}%"></i></div>
+            <div><strong>${formatSeats(currentNpsaSeats)} net paid seats</strong><strong>🎯 ${formatSeats(targetNpsaSeats)} seat target</strong></div>
+          </div>
+        `
+        : activeGoals.map((activeGoal, index) => {
+          const progress = progressLevels[index % progressLevels.length];
+          const currentValue = (1.2 + index * 0.18).toFixed(2);
+          const targetValue = (Number(currentValue) / (progress / 100)).toFixed(2);
+          return `
+            <div class="demo-active-progress">
+              <div><span>${activeGoal}</span><strong>${progress}% to goal</strong></div>
+              <div class="demo-active-progress-track"><i style="width:${progress}%"></i></div>
+              <div><strong>€${currentValue}M</strong><strong>🎯 €${targetValue}M target</strong></div>
+            </div>
+          `;
+        }).join("");
+      const goalSignals = copilotNpsaTarget
+        ? `
+          <p class="demo-goal-signal blue">📈 ${formatSeats(currentNpsaSeats)} of ${formatSeats(targetNpsaSeats)} Copilot net paid seats achieved.</p>
+          <p class="demo-goal-signal green">✦ ${formatSeats(Math.max(targetNpsaSeats - currentNpsaSeats, 0))} additional net paid seats needed to reach the cascaded goal.</p>
+        `
+        : `
+          <p class="demo-goal-signal blue">📈 Revenue at +9% growth, €18K ARR added this week. Key blocker: Woodgrove Bank EA→CSP migration not started — closes 43% of gap.</p>
+          <p class="demo-goal-signal green">✦ On track for €1.29M (+7.5%) — complete 2 EA→CSP migrations and convert 85 free Copilot users to close the gap.</p>
+        `;
       const progressTitle = [...mainContent.querySelectorAll("*")].find(
         (element) => !panel.contains(element)
           && element.children.length === 0
@@ -571,22 +614,10 @@
           ${choice === "own" ? `<span><strong>Custom goal:</strong> ${goal}</span>` : ""}
         </div>
         <div class="demo-active-progress-list">
-          ${activeGoals.map((activeGoal, index) => {
-            const progress = progressLevels[index % progressLevels.length];
-            const currentValue = (1.2 + index * 0.18).toFixed(2);
-            const targetValue = (Number(currentValue) / (progress / 100)).toFixed(2);
-            return `
-              <div class="demo-active-progress">
-                <div><span>${activeGoal}</span><strong>${progress}% to goal</strong></div>
-                <div class="demo-active-progress-track"><i style="width:${progress}%"></i></div>
-                <div><strong>€${currentValue}M</strong><strong>🎯 €${targetValue}M target</strong></div>
-              </div>
-            `;
-          }).join("")}
+          ${progressMarkup}
         </div>
         <div class="demo-active-goal-details">
-          <p class="demo-goal-signal blue">📈 Revenue at +9% growth, €18K ARR added this week. Key blocker: Woodgrove Bank EA→CSP migration not started — closes 43% of gap.</p>
-          <p class="demo-goal-signal green">✦ On track for €1.29M (+7.5%) — complete 2 EA→CSP migrations and convert 85 free Copilot users to close the gap.</p>
+          ${goalSignals}
           <p class="demo-goal-recommendation-note">🎯 Your <strong>recommendation categories below</strong> are highlighted for this goal — expand any category to explore AI-guided actions.</p>
           <div class="demo-goal-management">
             ${isEric && hasFabrikamGoal ? '<button type="button" data-goal-action="edit-organization">Edit organization goals</button>' : ""}
