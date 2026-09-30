@@ -578,10 +578,7 @@
           `;
         }).join("");
       const goalSignals = copilotNpsaTarget
-        ? `
-          <p class="demo-goal-signal blue">📈 ${formatSeats(currentNpsaSeats)} of ${formatSeats(targetNpsaSeats)} Copilot net paid seats achieved.</p>
-          <p class="demo-goal-signal green">✦ ${formatSeats(Math.max(targetNpsaSeats - currentNpsaSeats, 0))} additional net paid seats needed to reach the cascaded goal.</p>
-        `
+        ? ""
         : `
           <p class="demo-goal-signal blue">📈 Revenue at +9% growth, €18K ARR added this week. Key blocker: Woodgrove Bank EA→CSP migration not started — closes 43% of gap.</p>
           <p class="demo-goal-signal green">✦ On track for €1.29M (+7.5%) — complete 2 EA→CSP migrations and convert 85 free Copilot users to close the gap.</p>
