@@ -35,7 +35,7 @@
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
   const sarahCompletedTransactionsKey = "fabrikam-sarah-completed-transactions";
-  const buildVersion = "159";
+  const buildVersion = "153";
   let janeDistributorFilter = "All distributors";
   let openCurrentProposalWorkspace = null;
 
@@ -295,72 +295,12 @@
     if (event.key === "Escape") menu.hidden = true;
   });
 
-  const openCustomerWithInheritedGoal = (event) => {
-    event?.preventDefault();
-    event?.stopPropagation();
-    const card = event?.currentTarget?.closest(".demo-published-goal-card");
-    const plan = getPublishedPlan();
-    if (!card || !plan?.goals.length) return;
-
-    card.innerHTML = `
-      <section class="demo-inherited-goal-panel">
-        <div class="demo-inherited-goal-heading">
-          <span class="demo-goal-icon">🎯</span>
-          <div>
-            <span>FABRIKAM ORGANIZATION GOAL</span>
-            <strong>Apply goals to your portfolio</strong>
-            <p>Choose how these goals should guide your United States customer portfolio.</p>
-          </div>
-        </div>
-        <div class="demo-inherited-goals"></div>
-        <div class="demo-goal-choice-actions">
-          <button type="button" data-choice="accept">Accept Fabrikam goal</button>
-          <button type="button" data-choice="own">Set my own custom goal</button>
-        </div>
-        <div class="demo-own-goal-editor" hidden>
-          <div>
-            <strong>Set your custom goal</strong>
-            <p>Tell Partner Agent what success looks like.</p>
-          </div>
-          <div class="demo-own-goal-input">
-            <textarea rows="2" placeholder="Enter your customer portfolio goal"></textarea>
-            <button type="button" disabled>Set Goal</button>
-          </div>
-        </div>
-      </section>
-    `;
-    const panel = card.querySelector(".demo-inherited-goal-panel");
-    const goalList = panel.querySelector(".demo-inherited-goals");
-    plan.goals.forEach((goal) => {
-      const item = document.createElement("span");
-      item.textContent = goal;
-      goalList.appendChild(item);
-    });
-    panel.querySelector('[data-choice="accept"]').addEventListener("click", () => {
-      localStorage.setItem(inheritedGoalChoiceKey, JSON.stringify({
-        choice: "accepted",
-        goals: plan.goals,
-      }));
-      card.remove();
-      addPublishedGoalToSarahHome();
-    });
-    panel.querySelector('[data-choice="own"]').addEventListener("click", () => {
-      panel.querySelector(".demo-goal-choice-actions").hidden = true;
-      panel.querySelector(".demo-own-goal-editor").hidden = false;
-      panel.querySelector("textarea").focus();
-    });
-    const textarea = panel.querySelector("textarea");
-    const submit = panel.querySelector(".demo-own-goal-input button");
-    textarea.addEventListener("input", () => {
-      submit.disabled = !textarea.value.trim();
-    });
-    submit.addEventListener("click", () => {
-      const goal = textarea.value.trim();
-      if (!goal) return;
-      localStorage.setItem(inheritedGoalChoiceKey, JSON.stringify({ choice: "own", goal }));
-      panel.classList.add("accepted");
-      panel.innerHTML = `<strong>Custom portfolio goal applied</strong><p>${goal}</p>`;
-    });
+  const openCustomerWithInheritedGoal = () => {
+    sessionStorage.setItem("show-fabrikam-inherited-goal", "true");
+    const customerButton = [...document.querySelectorAll("aside button")].find(
+      (button) => button.querySelector("p")?.textContent.trim() === "Customer",
+    );
+    customerButton?.click();
   };
 
   const addPublishedGoalToSarahHome = () => {
@@ -629,8 +569,7 @@
     } catch {
       localStorage.removeItem(portfolioGoalChoiceKey);
     }
-    const forceGoalReview = new URLSearchParams(window.location.search).has("reviewGoal");
-    const previousChoice = isEric || forceGoalReview ? null : previousGoalDecision?.choice;
+    const previousChoice = isEric ? null : previousGoalDecision?.choice;
     const customerTitle = [...document.querySelectorAll("*")].find(
       (element) => element.children.length === 0 && element.textContent.trim() === "Customer overview",
     );
