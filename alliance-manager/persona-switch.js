@@ -41,7 +41,7 @@
 
   const normalizePartnerAgentLanguage = (root) => {
     const legacyAgentPattern =
-      /\b(?:PC|Partner(?: Center)?) AI Assist(?:ant)?\b|\bPartner Center AI\b|\bAI Assistant\b/gi;
+      /\bPartner Center Agent\b|\b(?:PC|Partner(?: Center)?) AI Assist(?:ant)?\b|\bPartner Center AI\b|\bAI Assistant\b/gi;
     const updateValue = (value) =>
       value?.replace(legacyAgentPattern, "Partner Agent");
 
@@ -1313,12 +1313,12 @@
         <nav class="demo-gcps-mini-rail" aria-label="Partner Center navigation">
           <button type="button" aria-label="Menu">☰</button>
           <button type="button" aria-label="Home">⌂</button>
-          <button class="active" type="button" aria-label="Partner Center Agent">♧</button>
+          <button class="active" type="button" aria-label="Partner Agent">♧</button>
           <button type="button" aria-label="Documents">▱</button>
           <button type="button" aria-label="Add">＋</button>
         </nav>
         <header>
-          <div><span>✧</span><strong>Partner Center Agent</strong></div>
+          <div><span>✧</span><strong>Partner Agent</strong></div>
           <div class="demo-gcps-window-actions"><button type="button" aria-label="Refresh proposal">↻</button><button type="button" aria-label="Expand proposal">↗</button><button type="button" aria-label="Close proposal">×</button></div>
         </header>
         <div class="demo-gcps-proposal-body">
