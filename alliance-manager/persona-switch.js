@@ -41,7 +41,7 @@
 
   const normalizePartnerAgentLanguage = (root) => {
     const legacyAgentPattern =
-      /Partner Center AI Assistant|PC AI Assistant|Partner AI Assistant|Partner Center AI|AI Assistant/g;
+      /\b(?:PC|Partner(?: Center)?) AI Assist(?:ant)?\b|\bPartner Center AI\b|\bAI Assistant\b/gi;
     const updateValue = (value) =>
       value?.replace(legacyAgentPattern, "Partner Agent");
 
@@ -72,7 +72,7 @@
   normalizePartnerAgentLanguage(document.documentElement);
   new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
-      if (mutation.type === "attributes") {
+      if (mutation.type === "attributes" || mutation.type === "characterData") {
         normalizePartnerAgentLanguage(mutation.target);
         return;
       }
@@ -82,6 +82,7 @@
     attributes: true,
     attributeFilter: ["aria-label", "placeholder", "title"],
     childList: true,
+    characterData: true,
     subtree: true,
   });
 
@@ -1510,7 +1511,7 @@
           subscriptionEndDate.setFullYear(subscriptionEndDate.getFullYear() + 1);
           const signalCustomer = isCustomerProposal
             ? proposalCustomer
-            : "Journey Innovations customer";
+            : copilotCustomers[0][0];
           localStorage.setItem(journeyTransactionSignalKey, JSON.stringify({
             sender: "Journey Innovations",
             senderUser: "Karin",
@@ -2164,7 +2165,7 @@
             billingFrequency: field("billing").value,
             termDuration: field("term").value,
             subscriptionEndDate: field("end-date").value,
-            status: "Ready for action",
+            status: "Ready for transact",
             signaledAt: new Date().toISOString(),
           };
           localStorage.setItem(journeyTransactionSignalKey, JSON.stringify(signal));
