@@ -35,7 +35,7 @@
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
   const sarahCompletedTransactionsKey = "fabrikam-sarah-completed-transactions";
-  const buildVersion = "151";
+  const buildVersion = "152";
   let janeDistributorFilter = "All distributors";
   let openCurrentProposalWorkspace = null;
 
@@ -682,7 +682,6 @@
         (sum, transaction) => sum + Number(transaction.seats || 0),
         0,
       );
-      const showNpsaProgress = !copilotNpsaTarget || completedNpsaSeats > 0;
       const currentNpsaSeats = targetNpsaSeats
         ? targetNpsaSeats * 0.54 + completedNpsaSeats
         : 0;
@@ -690,7 +689,7 @@
         ? Math.round((currentNpsaSeats / targetNpsaSeats) * 100)
         : 0;
       const formatSeats = (value) => Math.round(value).toLocaleString("en-US");
-      const progressMarkup = copilotNpsaTarget && showNpsaProgress
+      const progressMarkup = copilotNpsaTarget
         ? `
           <div class="demo-active-progress">
             <div><span>Copilot net paid seats (NPSA)</span><strong>${npsaProgress}% to goal</strong></div>
@@ -733,7 +732,7 @@
           <div>
             <span>🎯</span>
             <div>
-              <strong>${showNpsaProgress ? `Progress towards set goal${activeGoals.length === 1 ? "" : "s"}` : "Goal applied to customer portfolio"}</strong>
+              <strong>Progress towards set goal${activeGoals.length === 1 ? "" : "s"}</strong>
               <p>${activeGoals.length === 1 ? activeGoals[0] : `${activeGoals.length} goals applied to this portfolio`}</p>
             </div>
           </div>
@@ -743,7 +742,7 @@
           ${hasFabrikamGoal ? `<span><strong>Organization goal:</strong> ${createGoalSummary(plan.goals)}</span>` : ""}
           ${choice === "own" ? `<span><strong>Custom goal:</strong> ${goal}</span>` : ""}
         </div>
-        <div class="demo-active-progress-list" ${progressMarkup ? "" : "hidden"}>
+        <div class="demo-active-progress-list">
           ${progressMarkup}
         </div>
         <div class="demo-active-goal-details">
