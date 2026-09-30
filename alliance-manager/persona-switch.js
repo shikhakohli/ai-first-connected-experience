@@ -35,7 +35,7 @@
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
   const sarahCompletedTransactionsKey = "fabrikam-sarah-completed-transactions";
-  const buildVersion = "153";
+  const buildVersion = "154";
   let janeDistributorFilter = "All distributors";
   let openCurrentProposalWorkspace = null;
 
@@ -297,10 +297,8 @@
 
   const openCustomerWithInheritedGoal = () => {
     sessionStorage.setItem("show-fabrikam-inherited-goal", "true");
-    const customerButton = [...document.querySelectorAll("aside button")].find(
-      (button) => button.querySelector("p")?.textContent.trim() === "Customer",
-    );
-    customerButton?.click();
+    window.location.href =
+      `./current-113.html?persona=sarah&view=customer&reviewGoal=${Date.now()}`;
   };
 
   const addPublishedGoalToSarahHome = () => {
