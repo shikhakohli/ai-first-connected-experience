@@ -35,7 +35,7 @@
     ? paulCustomerProposalsKey
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
-  const buildVersion = "134";
+  const buildVersion = "140";
   let janeDistributorFilter = "All distributors";
   let openCurrentProposalWorkspace = null;
 
