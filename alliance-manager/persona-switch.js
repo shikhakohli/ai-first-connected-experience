@@ -35,7 +35,7 @@
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
   const sarahCompletedTransactionsKey = "fabrikam-sarah-completed-transactions";
-  const buildVersion = "154";
+  const buildVersion = "155";
   let janeDistributorFilter = "All distributors";
   let openCurrentProposalWorkspace = null;
 
@@ -295,10 +295,15 @@
     if (event.key === "Escape") menu.hidden = true;
   });
 
-  const openCustomerWithInheritedGoal = () => {
+  const openCustomerWithInheritedGoal = (event) => {
+    event?.preventDefault();
+    event?.stopPropagation();
     sessionStorage.setItem("show-fabrikam-inherited-goal", "true");
-    window.location.href =
-      `./current-113.html?persona=sarah&view=customer&reviewGoal=${Date.now()}`;
+    const reviewUrl = new URL("./current-113.html", window.location.href);
+    reviewUrl.searchParams.set("persona", "sarah");
+    reviewUrl.searchParams.set("view", "customer");
+    reviewUrl.searchParams.set("reviewGoal", String(Date.now()));
+    window.location.assign(reviewUrl.toString());
   };
 
   const addPublishedGoalToSarahHome = () => {
@@ -567,7 +572,8 @@
     } catch {
       localStorage.removeItem(portfolioGoalChoiceKey);
     }
-    const previousChoice = isEric ? null : previousGoalDecision?.choice;
+    const forceGoalReview = new URLSearchParams(window.location.search).has("reviewGoal");
+    const previousChoice = isEric || forceGoalReview ? null : previousGoalDecision?.choice;
     const customerTitle = [...document.querySelectorAll("*")].find(
       (element) => element.children.length === 0 && element.textContent.trim() === "Customer overview",
     );
