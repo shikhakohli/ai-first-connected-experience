@@ -316,8 +316,8 @@
         <div class="demo-user-prompt">Show me the transaction signal from Journey Innovations.</div>
         <div class="demo-assistant-label">✣ Partner Agent</div>
         <article class="demo-sarah-transaction-message">
-          <span class="demo-jane-proposal-badge">READY FOR ACTION · FROM JANE</span>
-          <h1>Journey Innovations says ${signal.customer} is ready for action</h1>
+          <span class="demo-jane-proposal-badge">READY FOR TRANSACT · FROM KARIN</span>
+          <h1>Journey Innovations says customer ${signal.customer} is ready for transact</h1>
           <p>Karin reviewed the Monetize Copilot recommendation and signaled Fabrikam to complete the transaction.</p>
           <dl>
             <div><dt>Customer</dt><dd>${signal.customer}</dd></div>
@@ -393,8 +393,8 @@
     card.innerHTML = `
       <div class="demo-goal-icon">↗</div>
       <div class="demo-goal-content">
-        <div class="demo-goal-eyebrow">READY FOR ACTION · FROM JANE</div>
-        <strong>Journey Innovations says ${signal.customer} is ready for action</strong>
+        <div class="demo-goal-eyebrow">READY FOR TRANSACT · FROM KARIN</div>
+        <strong>Journey Innovations says customer ${signal.customer} is ready for transact</strong>
         <p>${signal.seats} ${signal.product} seats at ${signal.unitPrice} per seat · ${signal.opportunitySize} opportunity</p>
         <div class="demo-goal-actions">
           <span>${signal.billingFrequency} · ${signal.termDuration}</span>
@@ -1525,7 +1525,7 @@
             billingFrequency: "Monthly",
             termDuration: "P1Y annual term",
             subscriptionEndDate: subscriptionEndDate.toISOString().slice(0, 10),
-            status: "Ready for action",
+            status: "Ready for transact",
             signaledAt: new Date().toISOString(),
           }));
           status.innerHTML = `
@@ -2173,7 +2173,7 @@
               <span>✓</span>
               <div>
                 <h4>Signal sent</h4>
-                <p>Fabrikam has been notified that ${customer} is ready for transaction.</p>
+                <p>Fabrikam has been notified that customer ${customer} is ready for transact.</p>
               </div>
             </div>
           `;
