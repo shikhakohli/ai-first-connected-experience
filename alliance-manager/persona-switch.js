@@ -39,6 +39,52 @@
   let janeDistributorFilter = "All distributors";
   let openCurrentProposalWorkspace = null;
 
+  const normalizePartnerAgentLanguage = (root) => {
+    const legacyAgentPattern =
+      /Partner Center AI Assistant|PC AI Assistant|Partner AI Assistant|Partner Center AI|AI Assistant/g;
+    const updateValue = (value) =>
+      value?.replace(legacyAgentPattern, "Partner Agent");
+
+    if (root.nodeType === Node.TEXT_NODE) {
+      const updated = updateValue(root.nodeValue);
+      if (updated !== root.nodeValue) root.nodeValue = updated;
+      return;
+    }
+
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    let textNode;
+    while ((textNode = walker.nextNode())) {
+      const updated = updateValue(textNode.nodeValue);
+      if (updated !== textNode.nodeValue) textNode.nodeValue = updated;
+    }
+
+    const elements = root.matches ? [root, ...root.querySelectorAll("*")] : [];
+    elements.forEach((element) => {
+      ["aria-label", "placeholder", "title"].forEach((attribute) => {
+        if (!element.hasAttribute(attribute)) return;
+        const value = element.getAttribute(attribute);
+        const updated = updateValue(value);
+        if (updated !== value) element.setAttribute(attribute, updated);
+      });
+    });
+  };
+
+  normalizePartnerAgentLanguage(document.documentElement);
+  new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === "attributes") {
+        normalizePartnerAgentLanguage(mutation.target);
+        return;
+      }
+      mutation.addedNodes.forEach(normalizePartnerAgentLanguage);
+    });
+  }).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["aria-label", "placeholder", "title"],
+    childList: true,
+    subtree: true,
+  });
+
   const getPublishedPlan = () => {
     const value = localStorage.getItem(publishedGoalKey);
     if (!value) return null;
@@ -78,7 +124,7 @@
   const menu = document.createElement("div");
   menu.className = "demo-persona-menu";
   menu.hidden = true;
-  const currentPersonaName = isEric ? "Eric" : isJane ? "Jane" : isPaul ? "Paul" : "Sarah";
+  const currentPersonaName = isEric ? "Eric" : isJane ? "Karin" : isPaul ? "Chris" : "Sarah";
   const currentPersonaRole = isEric
     ? "CFO · Fabrikam"
     : isJane
@@ -95,14 +141,14 @@
     `,
     !isJane && `
       <button class="demo-persona-option" type="button" data-persona="jane">
-        <span class="demo-persona-avatar demo-jane-avatar">J</span>
-        <span><strong>Jane</strong><small>Growth lead · Journey Innovations</small></span>
+        <span class="demo-persona-avatar demo-jane-avatar">K</span>
+        <span><strong>Karin</strong><small>Growth lead · Journey Innovations</small></span>
       </button>
     `,
     !isPaul && `
       <button class="demo-persona-option" type="button" data-persona="paul">
-        <span class="demo-persona-avatar">P</span>
-        <span><strong>Paul</strong><small>Alliance manager · Apex Partners</small></span>
+        <span class="demo-persona-avatar">C</span>
+        <span><strong>Chris</strong><small>Alliance manager · Apex Partners</small></span>
       </button>
     `,
     selectedPersona !== "sarah" && `
@@ -151,10 +197,10 @@
 
     accountButton.dataset.personaSwitchAttached = "true";
     if (isJane) {
-      accountButton.textContent = "J";
+      accountButton.textContent = "K";
       accountButton.classList.add("demo-jane-account");
     } else if (!isEric) {
-      accountButton.textContent = isPaul ? "P" : "SC";
+      accountButton.textContent = isPaul ? "C" : "SC";
       accountButton.classList.add("demo-sarah-account");
     }
     accountButton.setAttribute("aria-haspopup", "menu");
@@ -263,16 +309,16 @@
     detail.className = "demo-journey-recommendation demo-transaction-signal-chat";
     detail.innerHTML = `
       <header class="demo-journey-chat-header">
-        <div><span>✣</span><div><strong>Partner AI Assistant</strong><small>Fabrikam · Transaction handoff</small></div></div>
+        <div><span>✣</span><div><strong>Partner Agent</strong><small>Fabrikam · Transaction handoff</small></div></div>
         <button class="demo-journey-close" type="button" aria-label="Close transaction details">×</button>
       </header>
       <div class="demo-journey-thread">
         <div class="demo-user-prompt">Show me the transaction signal from Journey Innovations.</div>
-        <div class="demo-assistant-label">✣ Partner AI Assistant</div>
+        <div class="demo-assistant-label">✣ Partner Agent</div>
         <article class="demo-sarah-transaction-message">
           <span class="demo-jane-proposal-badge">READY FOR ACTION · FROM JANE</span>
           <h1>Journey Innovations says ${signal.customer} is ready for action</h1>
-          <p>Jane reviewed the Monetize Copilot recommendation and signaled Fabrikam to complete the transaction.</p>
+          <p>Karin reviewed the Monetize Copilot recommendation and signaled Fabrikam to complete the transaction.</p>
           <dl>
             <div><dt>Customer</dt><dd>${signal.customer}</dd></div>
             <div><dt>Distributor</dt><dd>${signal.distributor}</dd></div>
@@ -814,7 +860,7 @@
   const alignPersonaName = () => {
     const root = document.getElementById("root");
     if (!root) return;
-    const personaName = isEric ? "Eric" : isJane ? "Jane" : isPaul ? "Paul" : "Sarah";
+    const personaName = isEric ? "Eric" : isJane ? "Karin" : isPaul ? "Chris" : "Sarah";
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
     let textNode = walker.nextNode();
     while (textNode) {
@@ -822,7 +868,7 @@
         textNode.nodeValue = textNode.nodeValue.replaceAll("Ananya", personaName);
       }
       if (isPaul && textNode.nodeValue.includes("Sarah")) {
-        textNode.nodeValue = textNode.nodeValue.replaceAll("Sarah", "Paul");
+        textNode.nodeValue = textNode.nodeValue.replaceAll("Sarah", "Chris");
       }
       textNode = walker.nextNode();
     }
@@ -1103,12 +1149,12 @@
     detail.className = "demo-journey-recommendation";
     detail.innerHTML = `
       <header class="demo-journey-chat-header">
-        <div><span>✣</span><div><strong>Partner AI Assistant</strong><small>${isPaul ? "Apex Partners · Customer growth" : "Journey Innovations · Growth potential"}</small></div></div>
+        <div><span>✣</span><div><strong>Partner Agent</strong><small>${isPaul ? "Apex Partners · Customer growth" : "Journey Innovations · Growth potential"}</small></div></div>
         <button class="demo-journey-close" type="button" aria-label="Close recommendation details">×</button>
       </header>
       <div class="demo-journey-thread">
       <div class="demo-user-prompt">Show me ${isPaul ? "the top customer recommendations for Apex Partners" : "the recommendation details for Journey Innovations"}${copilotGoal ? " aligned to my Copilot goal" : ""}.</div>
-      <div class="demo-assistant-label">✣ Partner AI Assistant</div>
+      <div class="demo-assistant-label">✣ Partner Agent</div>
       <div class="demo-journey-card">
         <button class="demo-journey-back" type="button">← Back to recommendations</button>
         <h1>Journey Innovations</h1>
@@ -1146,7 +1192,7 @@
       </div>
       <div class="demo-copilot-customer-view" hidden>
         <div class="demo-user-prompt">Show me the customers behind the Monetize Copilot recommendation.</div>
-        <div class="demo-ai-label">✣ <strong>Partner AI Assistant</strong> <span>AI-generated content may be incorrect</span></div>
+        <div class="demo-ai-label">✣ <strong>Partner Agent</strong> <span>AI-generated content may be incorrect</span></div>
         <div class="demo-copilot-summary">
           <h1>Copilot Monetization Recommendation Details</h1>
           <p>I found <strong>${isPaul ? "1 Copilot Monetization recommendation" : "10 Copilot Monetization recommendations"}</strong> for ${isPaul ? "Apex Partners" : "Journey Innovations"}.</p>
@@ -1360,7 +1406,7 @@
       } else if (recipientView) {
         priorConversation.innerHTML = `
           <div class="demo-user-prompt">Show me the proposal Fabrikam sent to Journey Innovations.</div>
-          <div class="demo-assistant-label">✣ Partner AI Assistant</div>
+          <div class="demo-assistant-label">✣ Partner Agent</div>
           <div class="demo-jane-received-summary">
             <h2>Proposal received from Fabrikam</h2>
             <p><strong>Sarah from Fabrikam</strong> sent you a proposal based on a recommendation to convert free Copilot seats to paid licenses for <strong>14 customers</strong>.</p>
@@ -1467,7 +1513,7 @@
             : "Journey Innovations customer";
           localStorage.setItem(journeyTransactionSignalKey, JSON.stringify({
             sender: "Journey Innovations",
-            senderUser: "Jane",
+            senderUser: "Karin",
             recipient: "Fabrikam",
             recipientUser: "Sarah",
             distributor: "Fabrikam",
@@ -1563,7 +1609,7 @@
         event.currentTarget.disabled = true;
         const chatThread = workspace.querySelector(".demo-gcps-chat-thread");
         chatThread.appendChild(status);
-        showStatus("Proposal sent to Jane at Journey Innovations.");
+        showStatus("Proposal sent to Karin at Journey Innovations.");
         window.requestAnimationFrame(() => {
           chatThread.scrollTop = chatThread.scrollHeight;
         });
@@ -1797,7 +1843,7 @@
       workspace.innerHTML = `
         <div class="demo-proposal-resizer" role="separator" aria-label="Resize chat and proposal panels" aria-orientation="vertical" tabindex="0"><span>⋮</span></div>
         <header>
-          <div><span>✣</span><strong>Partner AI Assistant</strong></div>
+          <div><span>✣</span><strong>Partner Agent</strong></div>
           <button type="button" aria-label="Close proposal">×</button>
         </header>
         <div class="demo-proposal-body">
@@ -1952,7 +1998,7 @@
       editor.className = "demo-deal-editor";
       editor.innerHTML = `
         <div class="demo-user-prompt">Review deal details for ${customer}</div>
-        <div class="demo-ai-label">✣ <strong>Partner AI Assistant</strong> <span>Inline deal model</span></div>
+        <div class="demo-ai-label">✣ <strong>Partner Agent</strong> <span>Inline deal model</span></div>
         <div class="demo-deal-heading">
           <h4>Review and refine the Copilot opportunity</h4>
           <button type="button" data-action="collapse-deal">Collapse deal details</button>
@@ -2106,7 +2152,7 @@
         if (isJane) {
           const signal = {
             sender: "Journey Innovations",
-            senderUser: "Jane",
+            senderUser: "Karin",
             recipient: "Fabrikam",
             recipientUser: "Sarah",
             distributor: field("distributor").value,
@@ -2141,7 +2187,7 @@
         const tenantName = `${customer.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-").replaceAll(/^-|-$/g, "")}.onmicrosoft.com`;
         status.innerHTML = `
           <div class="demo-user-prompt">Transact this Copilot opportunity for ${customer}</div>
-          <div class="demo-ai-label">✣ <strong>Partner AI Assistant</strong> <span>Purchase review</span></div>
+          <div class="demo-ai-label">✣ <strong>Partner Agent</strong> <span>Purchase review</span></div>
           <h4>Review transaction details</h4>
           <p>Edit any customer, subscription, or commercial field inline before purchasing.</p>
           <div class="demo-transaction-fields">
@@ -2254,12 +2300,12 @@
     detail.className = "demo-journey-recommendation demo-jane-proposal-chat";
     detail.innerHTML = `
       <header class="demo-journey-chat-header">
-        <div><span>✣</span><div><strong>Partner AI Assistant</strong><small>Journey Innovations · Proposal received</small></div></div>
+        <div><span>✣</span><div><strong>Partner Agent</strong><small>Journey Innovations · Proposal received</small></div></div>
         <button class="demo-journey-close" type="button" aria-label="Close proposal conversation">×</button>
       </header>
       <div class="demo-journey-thread">
         <div class="demo-user-prompt">Show me the proposal Fabrikam sent to Journey Innovations.</div>
-        <div class="demo-assistant-label">✣ Partner AI Assistant</div>
+        <div class="demo-assistant-label">✣ Partner Agent</div>
         <article class="demo-jane-proposal-message">
           <span class="demo-jane-proposal-badge">PROPOSAL FROM FABRIKAM</span>
           <h1>Sarah has sent you a Monetize Copilot proposal</h1>

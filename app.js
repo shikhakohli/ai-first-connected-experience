@@ -54,15 +54,15 @@ function applyHomePersona() {
   }
 
   document.title = "Partner Center | Journey Innovations";
-  personaButton.textContent = "J";
+  personaButton.textContent = "K";
   personaButton.classList.add("jane-avatar");
-  document.getElementById("currentPersonaName").textContent = "Jane";
+  document.getElementById("currentPersonaName").textContent = "Karin";
   document.getElementById("currentPersonaRole").textContent =
     "Growth lead · Journey Innovations";
   document.getElementById("switchToEric").hidden = false;
   document.getElementById("switchToJane").hidden = true;
 
-  document.getElementById("welcomeTitle").textContent = "Hi, Jane";
+  document.getElementById("welcomeTitle").textContent = "Hi, Karin";
   document.getElementById("welcomeSubtitle").textContent =
     "Start with the opportunities that can accelerate Journey Innovations' growth.";
   document.getElementById("organizationLogo").textContent = "JI";
