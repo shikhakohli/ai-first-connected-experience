@@ -35,7 +35,7 @@
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
   const sarahCompletedTransactionsKey = "fabrikam-sarah-completed-transactions";
-  const buildVersion = "157";
+  const buildVersion = "158";
   let janeDistributorFilter = "All distributors";
   let openCurrentProposalWorkspace = null;
 
@@ -299,32 +299,10 @@
     event?.preventDefault();
     event?.stopPropagation();
     sessionStorage.setItem("show-fabrikam-inherited-goal", "true");
-    const reviewUrl = new URL("./current-113.html", window.location.href);
-    reviewUrl.searchParams.set("persona", "sarah");
-    reviewUrl.searchParams.set("view", "customer");
-    reviewUrl.searchParams.set("reviewGoal", String(Date.now()));
-    window.history.pushState({}, "", reviewUrl);
-    let attempts = 0;
-    const openCustomerReview = () => {
-      attempts += 1;
-      const customerButton = [...document.querySelectorAll("aside button")].find(
-        (button) => button.querySelector("p")?.textContent.trim() === "Customer",
-      );
-      customerButton?.click();
-      window.setTimeout(() => {
-        const customerOverview = [...document.querySelectorAll("*")].some(
-          (element) => element.children.length === 0
-            && element.textContent.trim() === "Customer overview",
-        );
-        if (customerOverview) {
-          document.querySelector(".demo-inherited-goal-panel")?.remove();
-          addInheritedGoalDecision();
-          return;
-        }
-        if (attempts < 10) openCustomerReview();
-      }, 150);
-    };
-    openCustomerReview();
+    const customerButton = [...document.querySelectorAll("aside button")].find(
+      (button) => button.querySelector("p")?.textContent.trim() === "Customer",
+    );
+    customerButton?.click();
   };
 
   const addPublishedGoalToSarahHome = () => {
@@ -593,7 +571,8 @@
     } catch {
       localStorage.removeItem(portfolioGoalChoiceKey);
     }
-    const forceGoalReview = new URLSearchParams(window.location.search).has("reviewGoal");
+    const forceGoalReview = new URLSearchParams(window.location.search).has("reviewGoal")
+      || sessionStorage.getItem("show-fabrikam-inherited-goal") === "true";
     const previousChoice = isEric || forceGoalReview ? null : previousGoalDecision?.choice;
     const customerTitle = [...document.querySelectorAll("*")].find(
       (element) => element.children.length === 0 && element.textContent.trim() === "Customer overview",
@@ -991,6 +970,7 @@
     });
 
     existingGoalCard.before(panel);
+    sessionStorage.removeItem("show-fabrikam-inherited-goal");
     const ericCustomGoal = isEric ? localStorage.getItem(ericPersonalGoalKey) : null;
     if (isEric && (plan?.goals.length || ericCustomGoal)) {
       const personalGoal = localStorage.getItem(ericPersonalGoalKey);
