@@ -35,7 +35,8 @@
     ? paulCustomerProposalsKey
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
-  const buildVersion = "148";
+  const sarahCompletedTransactionsKey = "fabrikam-sarah-completed-transactions";
+  const buildVersion = "149";
   let janeDistributorFilter = "All distributors";
   let openCurrentProposalWorkspace = null;
 
@@ -117,6 +118,43 @@
     proposals[customer] = proposal;
     localStorage.setItem(customerProposalsKey, JSON.stringify(proposals));
   };
+
+  const getSarahCompletedTransactions = () => {
+    try {
+      const transactions = JSON.parse(
+        localStorage.getItem(sarahCompletedTransactionsKey) || "[]",
+      );
+      return Array.isArray(transactions) ? transactions : [];
+    } catch {
+      localStorage.removeItem(sarahCompletedTransactionsKey);
+      return [];
+    }
+  };
+
+  const recordSarahCompletedTransaction = (transaction) => {
+    const transactions = getSarahCompletedTransactions();
+    const existingIndex = transactions.findIndex(
+      (existing) => existing.id === transaction.id,
+    );
+    if (existingIndex >= 0) {
+      transactions[existingIndex] = transaction;
+    } else {
+      transactions.push(transaction);
+    }
+    localStorage.setItem(sarahCompletedTransactionsKey, JSON.stringify(transactions));
+    return existingIndex < 0;
+  };
+
+  const parseCompactCurrency = (value) => {
+    const normalized = String(value || "").trim().toUpperCase();
+    const amount = Number(normalized.replaceAll(/[^0-9.-]/g, "")) || 0;
+    if (normalized.endsWith("M")) return amount * 1_000_000;
+    if (normalized.endsWith("K")) return amount * 1_000;
+    return amount;
+  };
+
+  const getCustomerTransactionId = (customer) =>
+    `customer:${String(customer || "").trim().toLowerCase()}`;
 
   const createGoalSummary = (goals) => {
     if (goals.length <= 2) return goals.join(" and ");
@@ -339,12 +377,24 @@
     const closeTransactionSignal = () => detail.remove();
     detail.querySelector(".demo-journey-close").addEventListener("click", closeTransactionSignal);
     detail.querySelector(".demo-sarah-transact").addEventListener("click", (event) => {
+      const dealSize = parseCompactCurrency(signal.opportunitySize);
+      const seats = Number(String(signal.seats || "").replaceAll(/[^0-9.-]/g, "")) || 0;
+      const incentiveEarned = dealSize * 0.195;
       const completedSignal = {
         ...signal,
         status: "Completed",
         completedAt: new Date().toISOString(),
+        incentiveEarned,
       };
       localStorage.setItem(journeyTransactionSignalKey, JSON.stringify(completedSignal));
+      recordSarahCompletedTransaction({
+        id: getCustomerTransactionId(signal.customer),
+        customer: signal.customer,
+        seats,
+        dealSize,
+        incentiveEarned,
+        completedAt: completedSignal.completedAt,
+      });
       document.querySelector(".demo-transaction-signal-card")?.remove();
       event.currentTarget.textContent = "Transaction completed";
       event.currentTarget.disabled = true;
@@ -405,6 +455,60 @@
     `;
     card.querySelector("button")?.addEventListener("click", () => {
       openSarahTransactionSignal(signal);
+    });
+    return true;
+  };
+
+  const addSarahCspIncentiveToManage = () => {
+    if (isEric || isJane || isPaul) return false;
+    const transactions = getSarahCompletedTransactions();
+    if (!transactions.length) {
+      document.querySelector(".demo-csp-incentive-card")?.remove();
+      return false;
+    }
+
+    const manageHeading = [...document.querySelectorAll("h2")].find(
+      (heading) => heading.textContent.trim() === "Manage",
+    );
+    const cardList = manageHeading?.parentElement?.parentElement?.querySelector(".space-y-3");
+    if (!cardList) return false;
+
+    const completedSeats = transactions.reduce(
+      (sum, transaction) => sum + Number(transaction.seats || 0),
+      0,
+    );
+    const incentivesEarned = transactions.reduce(
+      (sum, transaction) => sum + Number(transaction.incentiveEarned || 0),
+      0,
+    );
+    const latest = transactions.at(-1);
+    const cardVersion = `${transactions.length}:${completedSeats}:${incentivesEarned}`;
+    let card = cardList.querySelector(".demo-csp-incentive-card");
+    if (card?.dataset.cardVersion === cardVersion) return true;
+    if (!card) {
+      card = document.createElement("div");
+      card.className = "demo-csp-incentive-card";
+      cardList.prepend(card);
+    }
+    card.dataset.cardVersion = cardVersion;
+    card.innerHTML = `
+      <div class="demo-goal-icon">$</div>
+      <div class="demo-goal-content">
+        <div class="demo-goal-eyebrow">NEW CSP INCENTIVES EARNED</div>
+        <strong>${new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        }).format(incentivesEarned)} in CSP incentives earned</strong>
+        <p>${completedSeats.toLocaleString("en-US")} Microsoft 365 Copilot seats transacted${transactions.length === 1 && latest?.customer ? ` for ${latest.customer}` : ` across ${transactions.length} completed deals`}. Your Copilot NPSA progress has been updated.</p>
+        <div class="demo-goal-actions">
+          <span>Completed transaction</span>
+          <button type="button">View customer progress</button>
+        </div>
+      </div>
+    `;
+    card.querySelector("button").addEventListener("click", () => {
+      window.location.href =
+        `./current-113.html?persona=sarah&view=customer&fresh=${Date.now()}`;
     });
     return true;
   };
@@ -554,15 +658,23 @@
       const parseSeatValue = (value) =>
         Number(String(value ?? "").replaceAll(/[^0-9.-]/g, "")) || 0;
       const targetNpsaSeats = parseSeatValue(copilotNpsaTarget?.value);
-      const npsaProgress = targetNpsaSeats ? 54 : 0;
-      const currentNpsaSeats = targetNpsaSeats * (npsaProgress / 100);
+      const completedNpsaSeats = getSarahCompletedTransactions().reduce(
+        (sum, transaction) => sum + Number(transaction.seats || 0),
+        0,
+      );
+      const currentNpsaSeats = targetNpsaSeats
+        ? targetNpsaSeats * 0.54 + completedNpsaSeats
+        : 0;
+      const npsaProgress = targetNpsaSeats
+        ? Math.round((currentNpsaSeats / targetNpsaSeats) * 100)
+        : 0;
       const formatSeats = (value) => Math.round(value).toLocaleString("en-US");
       const progressMarkup = copilotNpsaTarget
         ? `
           <div class="demo-active-progress">
             <div><span>Copilot net paid seats (NPSA)</span><strong>${npsaProgress}% to goal</strong></div>
             <div class="demo-active-progress-track"><i style="width:${Math.min(npsaProgress, 100)}%"></i></div>
-            <div><strong>${formatSeats(currentNpsaSeats)} net paid seats</strong><strong>🎯 ${formatSeats(targetNpsaSeats)} seat target</strong></div>
+            <div><strong>${formatSeats(currentNpsaSeats)} net paid seats${completedNpsaSeats ? ` · +${formatSeats(completedNpsaSeats)} from completed deals` : ""}</strong><strong>🎯 ${formatSeats(targetNpsaSeats)} seat target</strong></div>
           </div>
         `
         : activeGoals.map((activeGoal, index) => {
@@ -875,12 +987,14 @@
   const downstreamGoalObserver = new MutationObserver(() => {
     addPublishedGoalToSarahHome();
     addJourneyTransactionSignalToSarahHome();
+    addSarahCspIncentiveToManage();
     addInheritedGoalDecision();
     addDismissControlsToHomeCards();
   });
   downstreamGoalObserver.observe(document.getElementById("root"), { childList: true, subtree: true });
   addPublishedGoalToSarahHome();
   addJourneyTransactionSignalToSarahHome();
+  addSarahCspIncentiveToManage();
   addInheritedGoalDecision();
   addDismissControlsToHomeCards();
 
@@ -2274,6 +2388,12 @@
           editor.dataset.offeredPrice = offeredPrice.toFixed(2);
           editor.dataset.dealSize = finalDealSize.toFixed(2);
           editor.dataset.seats = String(seats);
+          editor.dataset.incentivesTotal = incentivesTotal.toFixed(2);
+          const incentivesKeptPercent = Number(
+            editor.querySelector('[data-benefit-share="incentives"]').value,
+          );
+          editor.dataset.incentiveEarnedPerSeat =
+            ((incentivesTotal * (incentivesKeptPercent / 100)) / seats).toFixed(4);
         };
 
         editor.querySelectorAll(
@@ -2341,13 +2461,30 @@
           transactionField("price").addEventListener("input", updateTransactionTotal);
           status.querySelector('[data-transaction-action="purchase"]').addEventListener(
             "click",
-            () => {
+            (event) => {
               const ready = status.querySelector(".demo-purchase-ready");
+              const completedAt = new Date().toISOString();
+              if (!isPaul) {
+                const completedCustomer = transactionField("customer").value;
+                const completedSeats = Number(transactionField("seats").value || 0);
+                recordSarahCompletedTransaction({
+                  id: getCustomerTransactionId(completedCustomer),
+                  customer: completedCustomer,
+                  seats: completedSeats,
+                  dealSize: completedSeats
+                    * Number(transactionField("price").value || 0),
+                  incentiveEarned: completedSeats
+                    * Number(editor.dataset.incentiveEarnedPerSeat || 0),
+                  completedAt,
+                });
+              }
               ready.textContent =
                 `Purchase confirmed for ${transactionField("customer").value}: `
                 + `${transactionField("seats").value} Microsoft 365 Copilot seats `
                 + `at ${usd.format(Number(transactionField("price").value || 0))} per seat.`;
               ready.hidden = false;
+              event.currentTarget.textContent = "Purchase completed";
+              event.currentTarget.disabled = true;
             },
           );
           status.querySelector('[data-transaction-action="cancel"]').addEventListener(

@@ -936,6 +936,24 @@
   border-radius: 8px;
 }
 
+.demo-csp-incentive-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 12px;
+  padding: 15px;
+  color: #242424;
+  background: #f3f9f1;
+  border: 1px solid #a7c99b;
+  border-left: 3px solid #2f6b1d;
+  border-radius: 8px;
+}
+
+.demo-csp-incentive-card .demo-goal-icon {
+  color: #fff;
+  background: #2f6b1d;
+}
+
 .demo-home-dismissible {
   position: relative;
   padding-right: 42px !important;
