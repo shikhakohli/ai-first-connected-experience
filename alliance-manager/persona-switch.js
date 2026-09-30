@@ -1097,7 +1097,7 @@
             if (element.children.length) return;
             const text = element.textContent.trim();
             if (text === "€3,178,094.75") {
-              element.textContent = "€1,015,561.80";
+              element.textContent = "€171,553.80";
             }
           });
           const icon = firstCustomerCard.querySelector(".flex.items-center.gap-2.mb-4")
@@ -1149,27 +1149,27 @@
     const copilotGoal = appliedGoals.some((goal) => /copilot/i.test(goal));
     const additionalOpportunityRows = copilotGoal
       ? `
-          <article><button type="button"><span>›</span><strong>Copilot Chat Activation</strong><b>$1,412,400</b></button><p>19% of Copilot revenue potential · 4 of 163 customers</p></article>
+          <article><button type="button"><span>›</span><strong>Copilot Chat Activation</strong></button><p>4 of 163 customers</p></article>
           <article><button type="button"><span>›</span><strong>Copilot Acquisition</strong><b>$2,400,000</b></button><p>33% of Copilot revenue potential · 11 of 163 customers</p></article>
         `
       : `
           <article><button type="button"><span>›</span><strong>Upgrade M365 E3 to E5</strong><b>$2,953,200</b></button><p>23% of Maximum revenue potential · 9 of 163 customers</p></article>
           <article><button type="button"><span>›</span><strong>Migrate EA to CSP</strong><b>$2,182,800</b></button><p>17% of Maximum revenue potential · 7 of 163 customers</p></article>
           <article><button type="button"><span>›</span><strong>Seat expansion</strong><b>$1,669,200</b></button><p>13% of Maximum revenue potential · 5 of 163 customers</p></article>
-          <article><button type="button"><span>›</span><strong>Copilot Chat Activation</strong><b>$1,412,400</b></button><p>11% of Maximum revenue potential · 4 of 163 customers</p></article>
+          <article><button type="button"><span>›</span><strong>Copilot Chat Activation</strong></button><p>4 of 163 customers</p></article>
           <article><button type="button"><span>›</span><strong>Activate portfolio promotions</strong><b>$1,155,600</b></button><p>9% of Maximum revenue potential · 3 of 163 customers</p></article>
         `;
     const copilotCustomers = [
-      ["Contoso Customer 116", "5,535", "EUR 1,015,561.80", "Outlook-heavy", "Eligible promotion"],
-      ["Contoso Customer 119", "3,097", "EUR 568,504.80", "Teams-heavy", "Eligible promotion"],
-      ["Contoso Customer 121", "2,317", "EUR 425,303.40", "Outlook-heavy", "High free Copilot MAU"],
-      ["Contoso Customer 122", "2,283", "EUR 419,061.60", "Teams-heavy", "Eligible promotion"],
-      ["Contoso Customer 117", "1,968", "EUR 361,324.80", "Outlook-heavy", "High utilization"],
-      ["Contoso Customer 123", "1,966", "EUR 360,957.60", "Teams-heavy", "High free Copilot MAU"],
-      ["Contoso Customer 120", "1,920", "EUR 352,512.00", "Outlook-heavy", "Eligible promotion"],
-      ["Contoso Customer 118", "1,826", "EUR 335,239.20", "Teams-heavy", "High utilization"],
-      ["Contoso Customer 124", "1,481", "EUR 271,920.60", "Outlook-heavy", "High free Copilot MAU"],
-      ["Contoso Customer 126", "1,296", "EUR 237,945.60", "Teams-heavy", "Eligible promotion"],
+      ["Contoso Customer 116", "935", "EUR 171,553.80", "Outlook-heavy", "Eligible promotion"],
+      ["Contoso Customer 119", "897", "EUR 164,581.56", "Teams-heavy", "Eligible promotion"],
+      ["Contoso Customer 121", "817", "EUR 149,903.16", "Outlook-heavy", "High free Copilot MAU"],
+      ["Contoso Customer 122", "783", "EUR 143,664.84", "Teams-heavy", "Eligible promotion"],
+      ["Contoso Customer 117", "768", "EUR 140,912.64", "Outlook-heavy", "High utilization"],
+      ["Contoso Customer 123", "766", "EUR 140,545.68", "Teams-heavy", "High free Copilot MAU"],
+      ["Contoso Customer 120", "720", "EUR 132,105.60", "Outlook-heavy", "Eligible promotion"],
+      ["Contoso Customer 118", "626", "EUR 114,858.48", "Teams-heavy", "High utilization"],
+      ["Contoso Customer 124", "481", "EUR 88,253.88", "Outlook-heavy", "High free Copilot MAU"],
+      ["Contoso Customer 126", "296", "EUR 54,310.08", "Teams-heavy", "Eligible promotion"],
     ];
     const recommendationCustomers = isPaul ? copilotCustomers.slice(0, 1) : copilotCustomers;
     const detail = document.createElement("section");
@@ -1229,7 +1229,7 @@
             <li>All opportunities are for <strong>Microsoft 365 Copilot</strong> with P1Y terms and monthly billing.</li>
             <li>Several recommendations include an <strong>eligible promotion</strong>.</li>
             <li>Customers using free Copilot chat features show strong conversion potential to paid licenses.</li>
-            <li>The largest opportunity is <strong>Contoso Customer 116 at EUR 1,015,561.80</strong>.</li>
+            <li>The largest opportunity is <strong>Contoso Customer 116 at EUR 171,553.80</strong>.</li>
           </ul>
           <h2>Recommended actions</h2>
           <ul>
