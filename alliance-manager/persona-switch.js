@@ -6,10 +6,7 @@
       "fabrikam-eric-personal-goal",
       "journey-innovations-goal-choice",
       "apex-partners-goal-choice",
-      "fabrikam-journey-innovations-proposal",
-      "journey-innovations-customer-proposals",
       "apex-partners-customer-proposals",
-      "journey-innovations-transaction-signal",
     ].forEach((key) => localStorage.removeItem(key));
     sessionStorage.removeItem("show-fabrikam-inherited-goal");
   }
@@ -36,7 +33,7 @@
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
   const sarahCompletedTransactionsKey = "fabrikam-sarah-completed-transactions";
-  const buildVersion = "149";
+  const buildVersion = "150";
   let janeDistributorFilter = "All distributors";
   let openCurrentProposalWorkspace = null;
 
@@ -97,6 +94,15 @@
       return plan;
     } catch {
       localStorage.removeItem(publishedGoalKey);
+      return null;
+    }
+  };
+
+  const getJourneyProposal = () => {
+    try {
+      return JSON.parse(localStorage.getItem(journeyProposalKey) || "null");
+    } catch {
+      localStorage.removeItem(journeyProposalKey);
       return null;
     }
   };
@@ -1246,6 +1252,7 @@
     recipientConversation = null,
   ) => {
     if (document.querySelector(".demo-journey-recommendation")) return;
+    const receivedJourneyProposal = recipientContext ? getJourneyProposal() : null;
     const plan = getPublishedPlan();
     let goalDecision = null;
     try {
@@ -1285,7 +1292,23 @@
       ["Contoso Customer 124", "481", "EUR 88,253.88", "Outlook-heavy", "High free Copilot MAU"],
       ["Contoso Customer 126", "296", "EUR 54,310.08", "Teams-heavy", "Eligible promotion"],
     ];
-    const recommendationCustomers = isPaul ? copilotCustomers.slice(0, 1) : copilotCustomers;
+    const receivedCustomer = receivedJourneyProposal?.customer;
+    const receivedCustomerDefaults = copilotCustomers.find(
+      ([customer]) => customer === receivedCustomer,
+    ) || [receivedCustomer, "1", "$0.00", "Copilot-ready", "Proposal received from Fabrikam"];
+    const recommendationCustomers = isPaul
+      ? copilotCustomers.slice(0, 1)
+      : recipientContext && receivedCustomer
+        ? [[
+            receivedCustomer,
+            receivedJourneyProposal.seatCount || receivedJourneyProposal.seats || receivedCustomerDefaults[1],
+            receivedJourneyProposal.opportunitySize
+              || String(receivedJourneyProposal.opportunity || "").replace(/^Monetize Copilot · /, "")
+              || receivedCustomerDefaults[2],
+            receivedCustomerDefaults[3],
+            "Proposal received from Fabrikam",
+          ]]
+        : copilotCustomers;
     const detail = document.createElement("section");
     detail.className = "demo-journey-recommendation";
     detail.innerHTML = `
@@ -1336,7 +1359,7 @@
         <div class="demo-ai-label">✣ <strong>Partner Agent</strong> <span>AI-generated content may be incorrect</span></div>
         <div class="demo-copilot-summary">
           <h1>Copilot Monetization Recommendation Details</h1>
-          <p>I found <strong>${isPaul ? "1 Copilot Monetization recommendation" : "10 Copilot Monetization recommendations"}</strong> for ${isPaul ? "Apex Partners" : "Journey Innovations"}.</p>
+          <p>I found <strong>${recommendationCustomers.length} Copilot Monetization recommendation${recommendationCustomers.length === 1 ? "" : "s"}</strong> for ${isPaul ? "Apex Partners" : "Journey Innovations"}.</p>
           <h2>Key insights</h2>
           <ul>
             <li>The recommendations are concentrated in Contoso customer accounts managed by ${isPaul ? "Apex Partners" : "Journey Innovations"}.</li>
@@ -1367,7 +1390,7 @@
                   <span>SKU <strong>Microsoft 365 Copilot</strong></span>
                   <span>Recommended quantity <strong>${quantity}</strong></span>
                   <span>Billing <strong>Monthly · P1Y</strong></span>
-                  <span>List price <strong>21.84</strong></span>
+                  <span>${recipientContext && receivedCustomer ? "Distributor offer" : "List price"} <strong>${recipientContext && receivedCustomer ? receivedJourneyProposal.unitPrice : "21.84"}</strong></span>
                 </div>
                 <div class="demo-customer-signals"><span>${workload}</span><span>${signal}</span></div>
                 <p>Prioritize this account based on Copilot readiness, current engagement, and revenue potential.</p>
@@ -1434,19 +1457,6 @@
       existingConversation?.querySelectorAll("button").forEach((button) => {
         button.disabled = !button.dataset.janeProposalAction;
       });
-      if (!recipientView && !sentProposalView && !isPaul) {
-        localStorage.setItem(journeyProposalKey, JSON.stringify({
-          sender: "Fabrikam",
-          recipient: "Journey Innovations",
-          opportunity: `Monetize Copilot · ${proposalOpportunity}`,
-          customer: customer || undefined,
-          seats: seatCount || undefined,
-          unitPrice: unitPrice || undefined,
-          createdAt: new Date().toISOString(),
-          status: "Draft",
-        }));
-      }
-
       const workspace = document.createElement("section");
       workspace.className = "demo-proposal-workspace demo-gcps-proposal";
       workspace.innerHTML = `
@@ -1480,7 +1490,9 @@
                   <h3>${sentProposalView
                     ? `Sent proposal for ${proposalCustomer}`
                     : recipientView
-                    ? "Skeleton proposal from Fabrikam"
+                    ? isCustomerProposal
+                      ? `Customer proposal from Fabrikam for ${proposalCustomer}`
+                      : "Skeleton proposal from Fabrikam"
                     : isCustomerProposal
                       ? `Draft proposal for ${proposalCustomer}`
                       : "Draft proposal for Journey Innovations"}</h3>
@@ -1550,8 +1562,12 @@
           <div class="demo-assistant-label">✣ Partner Agent</div>
           <div class="demo-jane-received-summary">
             <h2>Proposal received from Fabrikam</h2>
-            <p><strong>Sarah from Fabrikam</strong> sent you a proposal based on a recommendation to convert free Copilot seats to paid licenses for <strong>14 customers</strong>.</p>
-            <p>This is a reseller skeleton for Journey Innovations to review and customize before sharing it with customers.</p>
+            <p><strong>Sarah from Fabrikam</strong> sent ${isCustomerProposal
+              ? `a customer-specific proposal for <strong>${proposalCustomer}</strong> with <strong>${proposalSeats} seats</strong> at <strong>${proposalUnitPrice} per seat</strong>.`
+              : "a proposal based on a recommendation to convert free Copilot seats to paid licenses for <strong>14 customers</strong>."}</p>
+            <p>${isCustomerProposal
+              ? "Review the distributor offer and decide how much reseller incentive benefit to pass to the customer."
+              : "This is a reseller skeleton for Journey Innovations to review and customize before sharing it with customers."}</p>
           </div>
         `;
       }
@@ -1739,13 +1755,23 @@
         showStatus("Customer proposal, partner pricing, and supporting materials are ready to download.");
       });
       workspace.querySelector('[data-gcps-action="send-reseller"]')?.addEventListener("click", (event) => {
-        localStorage.setItem(journeyProposalKey, JSON.stringify({
+        const sentAt = new Date().toISOString();
+        const sentProposal = {
           sender: "Fabrikam",
+          senderUser: "Sarah",
           recipient: "Journey Innovations",
-          opportunity: "Monetize Copilot · $3,466,800",
-          createdAt: new Date().toISOString(),
+          recipientUser: "Karin",
+          opportunity: `Monetize Copilot · ${proposalOpportunity}`,
+          opportunitySize: proposalOpportunity,
+          customer: isCustomerProposal ? proposalCustomer : undefined,
+          seatCount: isCustomerProposal ? seats.toLocaleString() : undefined,
+          unitPrice: isCustomerProposal ? `${pricePrefix}${price.toFixed(2)}` : undefined,
+          product,
+          createdAt: sentAt,
+          sentAt,
           status: "Sent",
-        }));
+        };
+        localStorage.setItem(journeyProposalKey, JSON.stringify(sentProposal));
         event.currentTarget.textContent = "Sent to reseller";
         event.currentTarget.disabled = true;
         const chatThread = workspace.querySelector(".demo-gcps-chat-thread");
@@ -1758,19 +1784,6 @@
       workspace.querySelector('[data-gcps-action="send-customer"]')?.addEventListener("click", (event) => {
         event.currentTarget.textContent = "Sent to customer";
         event.currentTarget.disabled = true;
-        if (isJane) {
-          localStorage.setItem(journeyProposalKey, JSON.stringify({
-            sender: "Journey Innovations",
-            recipient: isCustomerProposal ? proposalCustomer : "Customer",
-            opportunity: `Monetize Copilot · ${proposalOpportunity}`,
-            customer: isCustomerProposal ? proposalCustomer : undefined,
-            seats: seats.toLocaleString(),
-            unitPrice: `${pricePrefix}${price.toFixed(2)}`,
-            product,
-            createdAt: new Date().toISOString(),
-            status: "Sent to customer",
-          }));
-        }
         if ((isJane || isPaul) && isCustomerProposal) {
           saveCustomerProposal(proposalCustomer, {
             customer: proposalCustomer,
@@ -2134,6 +2147,20 @@
         ?.querySelector("strong")?.textContent || "0";
       const whitespace = Number(quantityText.replaceAll(",", ""));
       const usesBenefitSharing = !isEric && !isJane;
+      const receivedProposal = isJane ? getJourneyProposal() : null;
+      const receivedCustomerProposal = receivedProposal?.customer === customer
+        ? receivedProposal
+        : null;
+      const resellerSeatCount = Number(
+        String(
+          receivedCustomerProposal?.seatCount
+            || receivedCustomerProposal?.seats
+            || whitespace,
+        ).replaceAll(",", ""),
+      ) || 1;
+      const distributorSeatPrice = parseCompactCurrency(
+        receivedCustomerProposal?.unitPrice || "17.48",
+      );
       const suggestedEndDate = new Date();
       suggestedEndDate.setFullYear(suggestedEndDate.getFullYear() + 1);
       const editor = document.createElement("div");
@@ -2225,6 +2252,52 @@
               <span>✓ Deployment and enablement guidance</span>
             </div>
           </section>
+        ` : isJane ? `
+          <div class="demo-deal-fields demo-benefit-price-fields">
+            <label>Distributor<input data-field="distributor" value="Fabrikam" readonly /></label>
+            <label>Seat price offered by distributor ($)<input data-field="distributor-price" type="number" min="0" step="0.01" value="${distributorSeatPrice.toFixed(2)}" readonly /></label>
+            <label>Seat count<input data-field="whitespace" type="number" min="1" step="1" value="${resellerSeatCount}" readonly /></label>
+          </div>
+          <section class="demo-deal-section">
+            <div class="demo-deal-section-title">
+              <h5>Reseller incentives</h5>
+              <span>Program percentages are fixed and not editable</span>
+            </div>
+            <div class="demo-benefit-rate-table">
+              <div><span>Core · FY27</span><strong>2%</strong><output data-reseller-incentive="core"></output></div>
+              <div><span>Global Strategic Product Accelerator · Tier 2 · FY27</span><strong>7.5%</strong><output data-reseller-incentive="strategic"></output></div>
+              <div><span>Growth Accelerator · FY27</span><strong>10%</strong><output data-reseller-incentive="growth"></output></div>
+              <div class="total"><span>Total incentives</span><strong>19.5%</strong><output data-reseller-incentive="total"></output></div>
+            </div>
+          </section>
+          <section class="demo-deal-section demo-benefit-sharing-section">
+            <div class="demo-deal-section-title">
+              <h5>Customer incentive benefit</h5>
+              <span>Choose how much incentive Journey Innovations keeps versus passes to the customer</span>
+            </div>
+            <div class="demo-benefit-sharing">
+              <div class="total" data-reseller-share-row>
+                <div><strong>Total incentives</strong><output data-reseller-incentive-total></output></div>
+                <input type="range" min="0" max="100" step="1" value="50" data-reseller-incentive-share aria-label="Incentive percentage kept by Journey Innovations" />
+                <small><span data-reseller-incentive-kept></span><span data-reseller-incentive-passed></span></small>
+              </div>
+            </div>
+            <div class="demo-benefit-final-values">
+              <div><span>Price offered to customer</span><strong data-reseller-result="customer-price"></strong></div>
+              <div><span>Final customer deal size</span><strong data-reseller-result="deal-size"></strong></div>
+            </div>
+          </section>
+          <section class="demo-deal-section">
+            <div class="demo-deal-section-title">
+              <h5>Benefits eligible</h5>
+              <span>Included with this opportunity</span>
+            </div>
+            <div class="demo-benefit-list">
+              <span>✓ Copilot adoption workshop</span>
+              <span>✓ Customer success accelerators</span>
+              <span>✓ Deployment and enablement guidance</span>
+            </div>
+          </section>
         ` : `
           <div class="demo-deal-fields">
             <label class="demo-sku-field">SKU details
@@ -2273,7 +2346,7 @@
         `}
         <div class="demo-deal-actions">
           ${sentProposal ? '<button type="button" data-action="sent-proposal">See sent proposal</button>' : ""}
-          <button type="button" data-action="proposal" ${sentProposal && isJane ? "hidden" : ""}>${isJane ? "Create proposal" : isPaul ? sentProposal ? "Send revised proposal" : "Send proposal to customer" : "Create proposal for reseller"}</button>
+          <button type="button" data-action="proposal">${isJane ? sentProposal ? "Send revised customer proposal" : "Create customer proposal" : isPaul ? sentProposal ? "Send revised proposal" : "Send proposal to customer" : "Create proposal for reseller"}</button>
           <button type="button" data-action="transact">${isJane ? "Signal distributor for transact" : "Transact"}</button>
         </div>
         <div class="demo-transaction-status" hidden></div>
@@ -2283,6 +2356,101 @@
         editor.remove();
         card.scrollIntoView({ behavior: "smooth", block: "center" });
       });
+      if (isJane) {
+        const usd = new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        });
+        const shareSlider = editor.querySelector("[data-reseller-incentive-share]");
+        const updateResellerCalculator = () => {
+          const seats = Math.max(
+            1,
+            Number(editor.querySelector('[data-field="whitespace"]').value || 0),
+          );
+          const distributorPrice = Math.max(
+            0,
+            Number(editor.querySelector('[data-field="distributor-price"]').value || 0),
+          );
+          const distributorDealSize = distributorPrice * seats;
+          const incentiveAmounts = {
+            core: distributorDealSize * 0.02,
+            strategic: distributorDealSize * 0.075,
+            growth: distributorDealSize * 0.10,
+          };
+          const incentiveTotal = Object.values(incentiveAmounts)
+            .reduce((sum, amount) => sum + amount, 0);
+          const keptPercent = Number(shareSlider.value);
+          const incentiveKept = incentiveTotal * (keptPercent / 100);
+          const incentivePassed = incentiveTotal - incentiveKept;
+          const customerPrice = Math.max(0, distributorPrice - incentivePassed / seats);
+          const finalDealSize = customerPrice * seats;
+
+          Object.entries(incentiveAmounts).forEach(([key, amount]) => {
+            editor.querySelector(`[data-reseller-incentive="${key}"]`).textContent =
+              usd.format(amount);
+          });
+          editor.querySelector('[data-reseller-incentive="total"]').textContent =
+            usd.format(incentiveTotal);
+          editor.querySelector("[data-reseller-incentive-total]").textContent =
+            usd.format(incentiveTotal);
+          editor.querySelector("[data-reseller-incentive-kept]").textContent =
+            `Journey Innovations keeps ${keptPercent}% · ${usd.format(incentiveKept)}`;
+          editor.querySelector("[data-reseller-incentive-passed]").textContent =
+            `Passes ${100 - keptPercent}% · ${usd.format(incentivePassed)} to customer`;
+          editor.querySelector('[data-reseller-result="customer-price"]').textContent =
+            `${usd.format(customerPrice)} per seat`;
+          editor.querySelector('[data-reseller-result="deal-size"]').textContent =
+            usd.format(finalDealSize);
+          editor.dataset.customerPrice = customerPrice.toFixed(2);
+          editor.dataset.dealSize = finalDealSize.toFixed(2);
+          editor.dataset.seats = String(seats);
+        };
+
+        shareSlider.addEventListener("input", updateResellerCalculator);
+        editor.querySelector('[data-action="proposal"]').addEventListener("click", () => {
+          openGcpsProposalWorkspace({
+            customer,
+            opportunitySize: usd.format(Number(editor.dataset.dealSize)),
+            seatCount: Number(editor.dataset.seats).toLocaleString(),
+            unitPrice: usd.format(Number(editor.dataset.customerPrice)),
+            product: "Microsoft 365 Copilot",
+          });
+        });
+        editor.querySelector('[data-action="transact"]').addEventListener("click", () => {
+          const subscriptionEndDate = new Date();
+          subscriptionEndDate.setFullYear(subscriptionEndDate.getFullYear() + 1);
+          localStorage.setItem(journeyTransactionSignalKey, JSON.stringify({
+            sender: "Journey Innovations",
+            senderUser: "Karin",
+            recipient: "Fabrikam",
+            recipientUser: "Sarah",
+            distributor: "Fabrikam",
+            customer,
+            product: "Microsoft 365 Copilot",
+            seats: Number(editor.dataset.seats).toLocaleString(),
+            unitPrice: usd.format(Number(editor.dataset.customerPrice)),
+            opportunitySize: usd.format(Number(editor.dataset.dealSize)),
+            billingFrequency: "Monthly",
+            termDuration: "P1Y annual term",
+            subscriptionEndDate: subscriptionEndDate.toISOString().slice(0, 10),
+            status: "Ready for transact",
+            signaledAt: new Date().toISOString(),
+          }));
+          editor.innerHTML = `
+            <div class="demo-transaction-signal-success">
+              <span>✓</span>
+              <div>
+                <h4>Signal sent</h4>
+                <p>Fabrikam has been notified that customer ${customer} is ready for transact.</p>
+              </div>
+            </div>
+          `;
+          editor.scrollIntoView({ behavior: "smooth", block: "center" });
+        });
+        updateResellerCalculator();
+        editor.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
       if (usesBenefitSharing) {
         const benefitField = (name) => editor.querySelector(`[data-field="${name}"]`);
         const usd = new Intl.NumberFormat("en-US", {
@@ -2690,7 +2858,15 @@
         openGcpsProposalWorkspace();
       }
       if (button.dataset.janeProposalAction === "skeleton") {
-        openGcpsProposalWorkspace({ recipientView: true });
+        const proposal = getJourneyProposal();
+        openGcpsProposalWorkspace({
+          recipientView: true,
+          customer: proposal?.customer || "",
+          opportunitySize: proposal?.opportunitySize || "",
+          seatCount: proposal?.seatCount || proposal?.seats || "",
+          unitPrice: proposal?.unitPrice || "",
+          product: proposal?.product || "Microsoft 365 Copilot",
+        });
       }
       if (button.dataset.janeProposalAction === "customers") {
         customerView.hidden = false;
@@ -2726,7 +2902,15 @@
         detail.querySelector(".demo-see-customers").click();
       }
     } else if (initialView === "proposal-received") {
-      openGcpsProposalWorkspace({ recipientView: true });
+      const proposal = getJourneyProposal();
+      openGcpsProposalWorkspace({
+        recipientView: true,
+        customer: proposal?.customer || "",
+        opportunitySize: proposal?.opportunitySize || "",
+        seatCount: proposal?.seatCount || proposal?.seats || "",
+        unitPrice: proposal?.unitPrice || "",
+        product: proposal?.product || "Microsoft 365 Copilot",
+      });
     }
     document.querySelectorAll("aside button").forEach((button) => {
       if (!button.closest(".demo-journey-recommendation")) {
@@ -2737,6 +2921,10 @@
 
   const openJaneReceivedProposal = () => {
     if (document.querySelector(".demo-journey-recommendation")) return;
+    const proposal = getJourneyProposal();
+    const isCustomerProposal = Boolean(proposal?.customer);
+    const proposalSeats = proposal?.seatCount || proposal?.seats || "";
+    const proposalPrice = proposal?.unitPrice || "";
     const detail = document.createElement("section");
     detail.className = "demo-journey-recommendation demo-jane-proposal-chat";
     detail.innerHTML = `
@@ -2749,12 +2937,16 @@
         <div class="demo-assistant-label">✣ Partner Agent</div>
         <article class="demo-jane-proposal-message">
           <span class="demo-jane-proposal-badge">PROPOSAL FROM FABRIKAM</span>
-          <h1>Sarah has sent you a Monetize Copilot proposal</h1>
-          <p><strong>Sarah from Fabrikam</strong> sent you a proposal regarding a recommendation to convert free Copilot seats to paid licenses for <strong>14 customers</strong>.</p>
-          <p>You can review the reseller skeleton proposal or explore the customers included in the recommendation.</p>
+          <h1>Sarah has sent you a Monetize Copilot proposal${isCustomerProposal ? ` for ${proposal.customer}` : ""}</h1>
+          <p><strong>Sarah from Fabrikam</strong> sent you ${isCustomerProposal
+            ? `a customer-specific proposal for <strong>${proposal.customer}</strong> with <strong>${proposalSeats} seats</strong> at <strong>${proposalPrice} per seat</strong>.`
+            : "a proposal regarding a recommendation to convert free Copilot seats to paid licenses for <strong>14 customers</strong>."}</p>
+          <p>${isCustomerProposal
+            ? "Review Fabrikam’s distributor offer, your fixed reseller incentives, and how much incentive benefit to pass to the customer."
+            : "You can review the reseller skeleton proposal or explore the customers included in the recommendation."}</p>
           <div class="demo-jane-proposal-actions">
             <button type="button" data-jane-proposal-action="skeleton">View proposal</button>
-            <button type="button" data-jane-proposal-action="customers">View customer details</button>
+            <button type="button" data-jane-proposal-action="customers">${isCustomerProposal ? "View customer deal details" : "View customer details"}</button>
           </div>
         </article>
       </div>

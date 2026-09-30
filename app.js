@@ -12,10 +12,7 @@ if (performance.getEntriesByType("navigation")[0]?.type === "reload") {
     "fabrikam-eric-personal-goal",
     "journey-innovations-goal-choice",
     "apex-partners-goal-choice",
-    "fabrikam-journey-innovations-proposal",
-    "journey-innovations-customer-proposals",
     "apex-partners-customer-proposals",
-    "journey-innovations-transaction-signal",
   ].forEach((key) => localStorage.removeItem(key));
   sessionStorage.removeItem("show-fabrikam-inherited-goal");
 }
@@ -89,9 +86,14 @@ function applyHomePersona() {
     proposalCard.querySelector(".card-meta").textContent =
       `${proposal.status || "NEW"} · FROM ${proposal.sender || "FABRIKAM"}`;
     proposalCard.querySelector("h3").textContent =
-      `${proposal.sender || "Fabrikam"} created a proposal for you`;
+      proposal.customer
+        ? `${proposal.sender || "Fabrikam"} sent a proposal for ${proposal.customer}`
+        : `${proposal.sender || "Fabrikam"} created a proposal for you`;
+    proposalCard.querySelector("p").textContent = proposal.customer
+      ? `${proposal.seatCount || proposal.seats} ${proposal.product || "Microsoft 365 Copilot"} seats at ${proposal.unitPrice} per seat.`
+      : "Review Fabrikam's proposal to partner with Journey Innovations on a new customer growth opportunity.";
     proposalCard.querySelector(".card-detail").lastChild.textContent =
-      ` ${proposal.opportunity || "New customer growth opportunity"}`;
+      ` ${proposal.customer ? "Customer-specific proposal" : proposal.opportunity || "New customer growth opportunity"}`;
   }
   document.querySelectorAll(".jane-grow-card").forEach((card) => {
     card.hidden = false;
