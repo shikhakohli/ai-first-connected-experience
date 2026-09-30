@@ -7,6 +7,8 @@
       "journey-innovations-goal-choice",
       "apex-partners-goal-choice",
       "apex-partners-customer-proposals",
+      "journey-innovations-transaction-signal",
+      "fabrikam-sarah-completed-transactions",
     ].forEach((key) => localStorage.removeItem(key));
     sessionStorage.removeItem("show-fabrikam-inherited-goal");
   }
@@ -33,7 +35,7 @@
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
   const sarahCompletedTransactionsKey = "fabrikam-sarah-completed-transactions";
-  const buildVersion = "150";
+  const buildVersion = "151";
   let janeDistributorFilter = "All distributors";
   let openCurrentProposalWorkspace = null;
 
@@ -467,6 +469,18 @@
 
   const addSarahCspIncentiveToManage = () => {
     if (isEric || isJane || isPaul) return false;
+    let pendingTransaction = null;
+    try {
+      pendingTransaction = JSON.parse(
+        localStorage.getItem(journeyTransactionSignalKey) || "null",
+      );
+    } catch {
+      localStorage.removeItem(journeyTransactionSignalKey);
+    }
+    if (pendingTransaction?.status && pendingTransaction.status !== "Completed") {
+      document.querySelector(".demo-csp-incentive-card")?.remove();
+      return false;
+    }
     const transactions = getSarahCompletedTransactions();
     if (!transactions.length) {
       document.querySelector(".demo-csp-incentive-card")?.remove();
@@ -668,6 +682,7 @@
         (sum, transaction) => sum + Number(transaction.seats || 0),
         0,
       );
+      const showNpsaProgress = !copilotNpsaTarget || completedNpsaSeats > 0;
       const currentNpsaSeats = targetNpsaSeats
         ? targetNpsaSeats * 0.54 + completedNpsaSeats
         : 0;
@@ -675,7 +690,7 @@
         ? Math.round((currentNpsaSeats / targetNpsaSeats) * 100)
         : 0;
       const formatSeats = (value) => Math.round(value).toLocaleString("en-US");
-      const progressMarkup = copilotNpsaTarget
+      const progressMarkup = copilotNpsaTarget && showNpsaProgress
         ? `
           <div class="demo-active-progress">
             <div><span>Copilot net paid seats (NPSA)</span><strong>${npsaProgress}% to goal</strong></div>
@@ -683,7 +698,8 @@
             <div><strong>${formatSeats(currentNpsaSeats)} net paid seats${completedNpsaSeats ? ` · +${formatSeats(completedNpsaSeats)} from completed deals` : ""}</strong><strong>🎯 ${formatSeats(targetNpsaSeats)} seat target</strong></div>
           </div>
         `
-        : activeGoals.map((activeGoal, index) => {
+        : !copilotNpsaTarget
+          ? activeGoals.map((activeGoal, index) => {
           const progress = progressLevels[index % progressLevels.length];
           const currentValue = (1.2 + index * 0.18).toFixed(2);
           const targetValue = (Number(currentValue) / (progress / 100)).toFixed(2);
@@ -694,7 +710,8 @@
               <div><strong>€${currentValue}M</strong><strong>🎯 €${targetValue}M target</strong></div>
             </div>
           `;
-        }).join("");
+          }).join("")
+          : "";
       const goalSignals = copilotNpsaTarget
         ? ""
         : `
@@ -716,7 +733,7 @@
           <div>
             <span>🎯</span>
             <div>
-              <strong>Progress towards set goal${activeGoals.length === 1 ? "" : "s"}</strong>
+              <strong>${showNpsaProgress ? `Progress towards set goal${activeGoals.length === 1 ? "" : "s"}` : "Goal applied to customer portfolio"}</strong>
               <p>${activeGoals.length === 1 ? activeGoals[0] : `${activeGoals.length} goals applied to this portfolio`}</p>
             </div>
           </div>
@@ -726,7 +743,7 @@
           ${hasFabrikamGoal ? `<span><strong>Organization goal:</strong> ${createGoalSummary(plan.goals)}</span>` : ""}
           ${choice === "own" ? `<span><strong>Custom goal:</strong> ${goal}</span>` : ""}
         </div>
-        <div class="demo-active-progress-list">
+        <div class="demo-active-progress-list" ${progressMarkup ? "" : "hidden"}>
           ${progressMarkup}
         </div>
         <div class="demo-active-goal-details">
