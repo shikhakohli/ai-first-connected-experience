@@ -35,7 +35,7 @@
     ? paulCustomerProposalsKey
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
-  const buildVersion = "147";
+  const buildVersion = "148";
   let janeDistributorFilter = "All distributors";
   let openCurrentProposalWorkspace = null;
 
@@ -2044,7 +2044,7 @@
               <span>Percentage and total dollar benefit</span>
             </div>
             <div class="demo-benefit-rate-table">
-              <div><span>Promotion</span><label><input data-field="promotion" type="number" min="0" max="100" step="0.1" value="15" /><b>%</b></label><output data-benefit="promotion"></output></div>
+              <div><span>Promotion</span><label><input data-field="promotion" type="number" min="0" max="100" step="0.1" value="15" readonly /><b>%</b></label><output data-benefit="promotion"></output></div>
             </div>
           </section>
           <section class="demo-deal-section">
@@ -2070,7 +2070,7 @@
               <div><span>Core · FY27</span><strong data-incentive-rate-label="core">2%</strong><output data-incentive="core"></output></div>
               <div class="demo-strategic-tier-row">
                 <span>Global Strategic Product Accelerator · FY27</span>
-                <label><select data-field="strategic-tier"><option value="tier1">Tier 1</option><option value="tier2" selected>Tier 2</option></select><strong>7.5%</strong></label>
+                <label><select data-field="strategic-tier" disabled><option value="tier1">Tier 1</option><option value="tier2" selected>Tier 2</option></select><strong>7.5%</strong></label>
                 <output data-incentive="strategic"></output>
               </div>
               <div><span>Growth Accelerator · FY27</span><strong>10%</strong><output data-incentive="growth"></output></div>
@@ -2098,6 +2098,17 @@
             <div class="demo-benefit-final-values">
               <div><span>Offered price per seat</span><strong data-benefit-result="offered-price"></strong></div>
               <div><span>Final deal size</span><strong data-benefit-result="deal-size"></strong></div>
+            </div>
+          </section>
+          <section class="demo-deal-section">
+            <div class="demo-deal-section-title">
+              <h5>Benefits eligible</h5>
+              <span>Included with this opportunity</span>
+            </div>
+            <div class="demo-benefit-list">
+              <span>✓ Copilot adoption workshop</span>
+              <span>✓ Customer success accelerators</span>
+              <span>✓ Deployment and enablement guidance</span>
             </div>
           </section>
         ` : `
