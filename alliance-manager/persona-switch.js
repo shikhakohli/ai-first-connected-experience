@@ -35,7 +35,7 @@
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
   const sarahCompletedTransactionsKey = "fabrikam-sarah-completed-transactions";
-  const buildVersion = "152";
+  const buildVersion = "153";
   let janeDistributorFilter = "All distributors";
   let openCurrentProposalWorkspace = null;
 
@@ -347,6 +347,33 @@
     if (count && /^\d+$/.test(count.textContent.trim())) {
       count.textContent = String(Number(count.textContent.trim()) + 1);
     }
+    return true;
+  };
+
+  const alignJourneyOpportunityToGoal = () => {
+    if (isEric || isJane || isPaul) return false;
+    const plan = getPublishedPlan();
+    let goalDecision = null;
+    try {
+      goalDecision = JSON.parse(localStorage.getItem(inheritedGoalChoiceKey) || "null");
+    } catch {
+      localStorage.removeItem(inheritedGoalChoiceKey);
+    }
+    const hasAcceptedCopilotGoal = goalDecision?.choice === "accepted"
+      && (plan?.goals || goalDecision.goals || []).some((goal) => /copilot/i.test(goal));
+    const journeyCard = [...document.querySelectorAll(".bg-white")].find(
+      (card) => card.textContent.includes("Journey Innovations")
+        && card.textContent.includes("View recommendation details"),
+    );
+    if (!journeyCard) return false;
+    const opportunityValue = [...journeyCard.querySelectorAll("*")].find(
+      (element) => element.children.length === 0
+        && /(?:€|\$)?(?:12,840,000|7,279,200)\.00/.test(element.textContent.trim()),
+    );
+    if (!opportunityValue) return false;
+    opportunityValue.textContent = hasAcceptedCopilotGoal
+      ? "€7,279,200.00"
+      : "€12,840,000.00";
     return true;
   };
 
@@ -1008,6 +1035,7 @@
 
   const downstreamGoalObserver = new MutationObserver(() => {
     addPublishedGoalToSarahHome();
+    alignJourneyOpportunityToGoal();
     addJourneyTransactionSignalToSarahHome();
     addSarahCspIncentiveToManage();
     addInheritedGoalDecision();
@@ -1015,6 +1043,7 @@
   });
   downstreamGoalObserver.observe(document.getElementById("root"), { childList: true, subtree: true });
   addPublishedGoalToSarahHome();
+  alignJourneyOpportunityToGoal();
   addJourneyTransactionSignalToSarahHome();
   addSarahCspIncentiveToManage();
   addInheritedGoalDecision();
@@ -1286,14 +1315,14 @@
     const copilotGoal = appliedGoals.some((goal) => /copilot/i.test(goal));
     const additionalOpportunityRows = copilotGoal
       ? `
-          <article><button type="button"><span>›</span><strong>Copilot Chat Activation</strong></button><p>4 of 163 customers</p></article>
+          <article><button type="button"><span>›</span><strong>Copilot Chat Activation</strong><b>$1,412,400</b></button><p>19% of Copilot revenue potential · 4 of 163 customers</p></article>
           <article><button type="button"><span>›</span><strong>Copilot Acquisition</strong><b>$2,400,000</b></button><p>33% of Copilot revenue potential · 11 of 163 customers</p></article>
         `
       : `
           <article><button type="button"><span>›</span><strong>Upgrade M365 E3 to E5</strong><b>$2,953,200</b></button><p>23% of Maximum revenue potential · 9 of 163 customers</p></article>
           <article><button type="button"><span>›</span><strong>Migrate EA to CSP</strong><b>$2,182,800</b></button><p>17% of Maximum revenue potential · 7 of 163 customers</p></article>
           <article><button type="button"><span>›</span><strong>Seat expansion</strong><b>$1,669,200</b></button><p>13% of Maximum revenue potential · 5 of 163 customers</p></article>
-          <article><button type="button"><span>›</span><strong>Copilot Chat Activation</strong></button><p>4 of 163 customers</p></article>
+          <article><button type="button"><span>›</span><strong>Copilot Chat Activation</strong><b>$1,412,400</b></button><p>11% of Maximum revenue potential · 4 of 163 customers</p></article>
           <article><button type="button"><span>›</span><strong>Activate portfolio promotions</strong><b>$1,155,600</b></button><p>9% of Maximum revenue potential · 3 of 163 customers</p></article>
         `;
     const copilotCustomers = [
@@ -2201,7 +2230,7 @@
               <span>Percentage and total dollar benefit</span>
             </div>
             <div class="demo-benefit-rate-table">
-              <div><span>Promotion</span><label><input data-field="promotion" type="number" min="0" max="100" step="0.1" value="15" readonly /><b>%</b></label><output data-benefit="promotion"></output></div>
+              <div><span>Promotion</span><strong>15%</strong><output data-benefit="promotion"></output></div>
             </div>
           </section>
           <section class="demo-deal-section">
@@ -2227,7 +2256,7 @@
               <div><span>Core · FY27</span><strong data-incentive-rate-label="core">2%</strong><output data-incentive="core"></output></div>
               <div class="demo-strategic-tier-row">
                 <span>Global Strategic Product Accelerator · FY27</span>
-                <label><select data-field="strategic-tier" disabled><option value="tier1">Tier 1</option><option value="tier2" selected>Tier 2</option></select><strong>7.5%</strong></label>
+                <strong>Tier 2 · 7.5%</strong>
                 <output data-incentive="strategic"></output>
               </div>
               <div><span>Growth Accelerator · FY27</span><strong>10%</strong><output data-incentive="growth"></output></div>
@@ -2482,14 +2511,7 @@
           const seats = Math.max(1, Number(seatField.value || 0));
           if (Number(seatField.value) !== seats) seatField.value = String(seats);
           const dealBase = partnerPrice * seats;
-          const promotionField = benefitField("promotion");
-          const promotionRate = Math.min(
-            100,
-            Math.max(0, Number(promotionField.value || 0)),
-          );
-          if (Number(promotionField.value) !== promotionRate) {
-            promotionField.value = String(promotionRate);
-          }
+          const promotionRate = 15;
           const promotionTotal = dealBase * (promotionRate / 100);
           const marginAmounts = {
             "new-offer": dealBase * 0.03,
@@ -2581,7 +2603,7 @@
         };
 
         editor.querySelectorAll(
-          '[data-field="erp-price"], [data-field="partner-price"], [data-field="whitespace"], [data-field="promotion"], [data-field="cocp"], [data-field="strategic-tier"]',
+          '[data-field="erp-price"], [data-field="partner-price"], [data-field="whitespace"], [data-field="cocp"]',
         ).forEach((input) => {
           input.addEventListener("input", updateBenefitCalculator);
           input.addEventListener("change", updateBenefitCalculator);
