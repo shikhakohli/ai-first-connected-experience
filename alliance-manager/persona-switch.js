@@ -35,7 +35,7 @@
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
   const sarahCompletedTransactionsKey = "fabrikam-sarah-completed-transactions";
-  const buildVersion = "155";
+  const buildVersion = "156";
   let janeDistributorFilter = "All distributors";
   let openCurrentProposalWorkspace = null;
 
@@ -303,7 +303,28 @@
     reviewUrl.searchParams.set("persona", "sarah");
     reviewUrl.searchParams.set("view", "customer");
     reviewUrl.searchParams.set("reviewGoal", String(Date.now()));
-    window.location.assign(reviewUrl.toString());
+    window.history.pushState({}, "", reviewUrl);
+    let attempts = 0;
+    const openCustomerReview = () => {
+      attempts += 1;
+      const customerButton = [...document.querySelectorAll("aside button")].find(
+        (button) => button.querySelector("p")?.textContent.trim() === "Customer",
+      );
+      customerButton?.click();
+      window.setTimeout(() => {
+        const customerOverview = [...document.querySelectorAll("*")].some(
+          (element) => element.children.length === 0
+            && element.textContent.trim() === "Customer overview",
+        );
+        if (customerOverview) {
+          document.querySelector(".demo-inherited-goal-panel")?.remove();
+          addInheritedGoalDecision();
+          return;
+        }
+        if (attempts < 10) openCustomerReview();
+      }, 150);
+    };
+    openCustomerReview();
   };
 
   const addPublishedGoalToSarahHome = () => {
