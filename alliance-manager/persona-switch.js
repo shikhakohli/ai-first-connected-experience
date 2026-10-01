@@ -1466,7 +1466,7 @@
               <p>Free Copilot chat MAU up 34% QoQ — paid attach at 12% vs 28% peer benchmark</p>
               <p>87 Copilot licenses purchased with only 23% monthly active usage</p>
               <div>
-                <button type="button">Create reseller customer proposal</button>
+                <button type="button">${isJane ? "Create reseller customer proposal" : "Prepare reseller quote"}</button>
                 <button class="demo-see-customers" type="button">See customer details</button>
                 <button type="button">Decline</button>
               </div>
@@ -1517,7 +1517,7 @@
                 <div class="demo-customer-signals"><span>${workload}</span><span>${signal}</span></div>
                 <p>Prioritize this account based on Copilot readiness, current engagement, and revenue potential.</p>
                 <div class="demo-customer-actions">
-                  ${sentProposal ? '<button type="button" data-action="sent-proposal">See sent proposal</button>' : ""}
+                  ${sentProposal ? `<button type="button" data-action="sent-proposal">${isJane ? "See sent proposal" : "See sent quote"}</button>` : ""}
                   <button type="button">Review deal details</button>
                 </div>
               </article>
@@ -1923,7 +1923,7 @@
               const sentButton = document.createElement("button");
               sentButton.type = "button";
               sentButton.dataset.action = "sent-proposal";
-              sentButton.textContent = "See sent proposal";
+              sentButton.textContent = isPaul ? "See sent quote" : "See sent proposal";
               customerActions.prepend(sentButton);
             }
             const dealActions = card.querySelector(".demo-deal-actions");
@@ -1931,12 +1931,12 @@
               const sentButton = document.createElement("button");
               sentButton.type = "button";
               sentButton.dataset.action = "sent-proposal";
-              sentButton.textContent = "See sent proposal";
+              sentButton.textContent = isPaul ? "See sent quote" : "See sent proposal";
               dealActions.prepend(sentButton);
               const proposalButton = dealActions.querySelector('[data-action="proposal"]');
               if (proposalButton) {
                 proposalButton.hidden = false;
-                proposalButton.textContent = isPaul ? "Send revised proposal" : "Send new proposal";
+                proposalButton.textContent = isPaul ? "Send revised reseller quote" : "Send new proposal";
               }
             }
           });
@@ -2468,8 +2468,8 @@
           </section>
         `}
         <div class="demo-deal-actions">
-          ${sentProposal ? '<button type="button" data-action="sent-proposal">See sent proposal</button>' : ""}
-          <button type="button" data-action="proposal">${isJane ? sentProposal ? "Send revised customer proposal" : "Create customer proposal" : isPaul ? sentProposal ? "Send revised proposal" : "Send proposal to customer" : "Create proposal for reseller"}</button>
+          ${sentProposal ? `<button type="button" data-action="sent-proposal">${isJane ? "See sent proposal" : "See sent quote"}</button>` : ""}
+          <button type="button" data-action="proposal">${isJane ? sentProposal ? "Send revised customer proposal" : "Create customer proposal" : sentProposal ? "Send revised reseller quote" : "Send reseller quote"}</button>
           <button type="button" data-action="transact">${isJane ? "Signal distributor for transact" : "Transact"}</button>
         </div>
         <div class="demo-transaction-status" hidden></div>
@@ -2970,7 +2970,7 @@
     detail.addEventListener("click", (event) => {
       const button = event.target.closest("button");
       if (!button) return;
-      if (button.textContent.trim() === "Create reseller customer proposal") {
+      if (["Create reseller customer proposal", "Prepare reseller quote"].includes(button.textContent.trim())) {
         openGcpsProposalWorkspace();
       }
       if (button.dataset.janeProposalAction === "skeleton") {
@@ -2990,7 +2990,7 @@
         button.textContent = "Customer details shown below";
         customerView.scrollIntoView({ behavior: "smooth", block: "start" });
       }
-      if (button.textContent.trim() === "See sent proposal") {
+      if (["See sent proposal", "See sent quote"].includes(button.textContent.trim())) {
         const customer = button.closest(".demo-customer-recommendation")
           ?.querySelector("h3")?.textContent.trim();
         const sentProposal = customer ? getCustomerProposal(customer) : null;
