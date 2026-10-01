@@ -229,7 +229,13 @@
       (label) => label.textContent.trim() === "Home",
     );
     const navigation = homeLabel?.closest("aside");
-    if (!navigation || navigation.dataset.ericNavAligned) return false;
+    if (!navigation) return false;
+
+    const agentHeading = [...navigation.querySelectorAll("*")].find(
+      (element) => !element.children.length && element.textContent.trim() === "Agents",
+    );
+    if (agentHeading) agentHeading.textContent = "Partner Agent Skills";
+    if (navigation.dataset.ericNavAligned) return true;
 
     navigation.dataset.ericNavAligned = "true";
     navigation.classList.add("demo-eric-nav");
@@ -2321,7 +2327,7 @@
               <span>Program percentages are fixed and not editable</span>
             </div>
             <label class="demo-cocp-field">Is COCP applicable?
-              <select data-field="cocp"><option selected>No</option><option>Yes</option></select>
+              <select data-field="cocp" disabled aria-disabled="true"><option selected>No</option></select>
             </label>
             <div class="demo-benefit-rate-table">
               <div><span>Core · FY27</span><strong data-incentive-rate-label="core">2%</strong><output data-incentive="core"></output></div>

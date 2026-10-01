@@ -1491,6 +1491,13 @@
   font-size: 11px;
 }
 .demo-cocp-field select { min-width: 95px; }
+.demo-cocp-field select:disabled {
+  color: #424242;
+  background: #f3f2f1;
+  border-color: #d2d0ce;
+  opacity: 1;
+  cursor: not-allowed;
+}
 .demo-benefit-sharing { display: grid; gap: 10px; }
 .demo-benefit-sharing > div {
   padding: 10px;
