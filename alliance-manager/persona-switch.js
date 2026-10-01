@@ -1501,7 +1501,11 @@
           <h2>Recommendations for ${isPaul ? "Apex Partners" : "Journey Innovations"} customers</h2>
           <div class="demo-customer-recommendations">
             ${recommendationCustomers.map(([customer, quantity, value, workload, signal]) => {
-              const sentProposal = isJane || isPaul ? getCustomerProposal(customer) : null;
+              const sentProposal = isJane && recipientContext
+                ? null
+                : isJane || isPaul
+                  ? getCustomerProposal(customer)
+                  : null;
               return `
               <article class="demo-customer-recommendation">
                 <div class="demo-customer-recommendation-head">
@@ -1517,8 +1521,9 @@
                 <div class="demo-customer-signals"><span>${workload}</span><span>${signal}</span></div>
                 <p>Prioritize this account based on Copilot readiness, current engagement, and revenue potential.</p>
                 <div class="demo-customer-actions">
-                  ${sentProposal ? `<button type="button" data-action="sent-proposal">${isJane ? "See sent proposal" : "See sent quote"}</button>` : ""}
                   <button type="button">Review deal details</button>
+                  <button type="button" data-action="prepare-offer">${isJane ? "Prepare customer proposal" : "Prepare reseller quote"}</button>
+                  ${sentProposal ? `<button type="button" data-action="sent-proposal">${isJane ? "See sent proposal" : "See sent quote"}</button>` : ""}
                 </div>
               </article>
             `;
@@ -1570,6 +1575,8 @@
       const numericSeats = Number(String(seatCount).replaceAll(",", "")) || 35;
       const numericPrice = Number.parseFloat(String(unitPrice).replace(/[^0-9.]/g, "")) || 27.73;
       const pricePrefix = /EUR|€/i.test(unitPrice) ? "EUR " : "$";
+      const outboundArtifact = isJane ? "customer proposal" : "reseller quote";
+      const outboundArtifactTitle = isJane ? "Customer proposal" : "Reseller quote";
       detail.querySelector(".demo-proposal-workspace")?.remove();
       detail.classList.add("proposal-open");
       const existingConversation = detail.querySelector(".demo-journey-thread")?.cloneNode(true);
@@ -1591,7 +1598,7 @@
         </nav>
         <header>
           <div><span>✧</span><strong>Partner Agent</strong></div>
-          <div class="demo-gcps-window-actions"><button type="button" aria-label="Refresh proposal">↻</button><button type="button" aria-label="Expand proposal">↗</button><button type="button" aria-label="Close proposal">×</button></div>
+          <div class="demo-gcps-window-actions"><button type="button" aria-label="Refresh ${outboundArtifact}">↻</button><button type="button" aria-label="Expand ${outboundArtifact}">↗</button><button type="button" aria-label="Close ${outboundArtifact}">×</button></div>
         </header>
         <div class="demo-gcps-proposal-body">
           <aside class="demo-gcps-config">
@@ -1599,28 +1606,30 @@
               <div class="demo-gcps-prior-conversation"></div>
               <div class="demo-gcps-user-message">
                 <span>${sentProposalView
-                  ? `See sent proposal for ${proposalCustomer}`
+                  ? `See sent ${outboundArtifact} for ${proposalCustomer}`
                   : recipientView
-                  ? "View proposal"
+                  ? "View quote"
                   : isCustomerProposal
-                    ? `${isPaul ? "Prepare" : "Create"} a Monetize Copilot proposal for ${proposalCustomer}`
-                    : "Create Monetize Copilot proposal"}</span><strong>${isJane ? "J" : isPaul ? "P" : "SC"}</strong>
+                    ? `Prepare a Monetize Copilot ${outboundArtifact} for ${proposalCustomer}`
+                    : `Prepare Monetize Copilot ${outboundArtifact}`}</span><strong>${isJane ? "J" : isPaul ? "P" : "SC"}</strong>
               </div>
               <div class="demo-gcps-assistant-response">
                 <span class="demo-gcps-sparkle">✧</span>
                 <div class="demo-gcps-config-card">
                   <h3>${sentProposalView
-                    ? `Sent proposal for ${proposalCustomer}`
+                    ? `Sent ${outboundArtifact} for ${proposalCustomer}`
                     : recipientView
                     ? isCustomerProposal
-                      ? `Customer proposal from Fabrikam for ${proposalCustomer}`
-                      : "Skeleton proposal from Fabrikam"
+                    ? `Distributor quote from Fabrikam for ${proposalCustomer}`
+                    : "Quote from Fabrikam"
                     : isCustomerProposal
-                      ? `Draft proposal for ${proposalCustomer}`
-                      : "Draft proposal for Journey Innovations"}</h3>
+                    ? `Draft ${outboundArtifact} for ${proposalCustomer}`
+                    : `Draft ${outboundArtifact} for Journey Innovations`}</h3>
                   <p>${isCustomerProposal
-                    ? `I created a customer-specific proposal for ${proposalCustomer} covering ${proposalSeats} ${product} seats at ${proposalUnitPrice} per seat. The full opportunity value is ${proposalOpportunity}.`
-                    : "This is a skeleton document for the reseller to customize. Unit prices start from Microsoft default price lists; seat counts are omitted on purpose. Confirm the package before Journey Innovations sends it to their customers."}</p>
+                    ? recipientView
+                    ? `Fabrikam prepared a customer-specific quote for ${proposalCustomer} covering ${proposalSeats} ${product} seats at ${proposalUnitPrice} per seat. The full opportunity value is ${proposalOpportunity}. You can use these terms to prepare the customer proposal.`
+                    : `I prepared a customer-specific ${outboundArtifact} for ${proposalCustomer} covering ${proposalSeats} ${product} seats at ${proposalUnitPrice} per seat. The full opportunity value is ${proposalOpportunity}.`
+                    : `This is a skeleton ${outboundArtifact} to customize. Unit prices start from Microsoft default price lists; seat counts are omitted on purpose.`}</p>
                   <ol>
                     <li>Seats and pricing <span>(Page 1)</span></li>
                     <li>MCI activities <span>(Page 3)</span></li>
@@ -1631,10 +1640,10 @@
                     <dl>
                       <div><dt>Opportunity</dt><dd>Monetize Copilot opportunity worth ${proposalOpportunity}</dd></div>
                       <div><dt>${isCustomerProposal ? "Customer" : "Handoff"}</dt><dd>${isCustomerProposal ? proposalCustomer : "For Journey Innovations to pass to their customers"}</dd></div>
-                      <div><dt>Package</dt><dd>${isCustomerProposal ? "Customer-specific proposal" : "Reseller skeleton"}</dd></div>
+                      <div><dt>Package</dt><dd>${isCustomerProposal ? recipientView ? "Customer-specific distributor quote" : outboundArtifactTitle : `${outboundArtifactTitle} skeleton`}</dd></div>
                       <div><dt>${isCustomerProposal ? "Seat count" : "Customer coverage"}</dt><dd>${isCustomerProposal ? proposalSeats : "14 eligible customers (details attached)"}</dd></div>
                       <div><dt>Product alignment</dt><dd>${isCustomerProposal ? product : "Microsoft 365 Business Premium with Copilot"}</dd></div>
-                      <div><dt>${isCustomerProposal ? "Unit pricing" : "Proposal defaults"}</dt><dd id="gcpsProposalDefaults">${isCustomerProposal ? `${proposalUnitPrice}/seat · ${proposalOpportunity} total opportunity` : "$27.73/seat (MS list) · Seats to be completed by reseller"}</dd></div>
+                      <div><dt>${isCustomerProposal ? "Unit pricing" : `${outboundArtifactTitle} defaults`}</dt><dd id="gcpsProposalDefaults">${isCustomerProposal ? `${proposalUnitPrice}/seat · ${proposalOpportunity} total opportunity` : "$27.73/seat (MS list) · Seats to be completed by reseller"}</dd></div>
                     </dl>
                     <p class="demo-gcps-notice">Figures use Microsoft's default price lists. ${isPaul ? "Review pricing, eligibility, incentives, taxes, and terms before sending to the customer." : "The reseller should update pricing, eligibility, incentives, taxes, and terms before sending to their customers."}</p>
                   </div>
@@ -1654,8 +1663,8 @@
               <div><span class="demo-gcps-file-icon">▱</span><strong>Monetize Copilot for ${proposalCustomer}</strong><a>(all documents)</a></div>
               <button class="demo-gcps-document-close" type="button" aria-label="Close document">×</button>
             </div>
-            <nav class="demo-gcps-tabs" aria-label="Proposal documents">
-              <button type="button" data-document="customer" aria-selected="true">Customer proposal</button>
+            <nav class="demo-gcps-tabs" aria-label="${outboundArtifactTitle} documents">
+              <button type="button" data-document="customer" aria-selected="true">${outboundArtifactTitle}</button>
               <button type="button" data-document="partner" aria-selected="false">Partner pricing</button>
               <button type="button" data-document="materials" aria-selected="false">Supporting materials</button>
             </nav>
@@ -1680,13 +1689,13 @@
         priorConversation.append(...existingConversation.childNodes);
       } else if (recipientView) {
         priorConversation.innerHTML = `
-          <div class="demo-user-prompt">Show me the proposal Fabrikam sent to Journey Innovations.</div>
+          <div class="demo-user-prompt">Show me the quote Fabrikam sent to Journey Innovations.</div>
           <div class="demo-assistant-label">✣ Partner Agent</div>
           <div class="demo-jane-received-summary">
-            <h2>Proposal received from Fabrikam</h2>
+            <h2>Quote received from Fabrikam</h2>
             <p><strong>Sarah from Fabrikam</strong> sent ${isCustomerProposal
-              ? `a customer-specific proposal for <strong>${proposalCustomer}</strong> with <strong>${proposalSeats} seats</strong> at <strong>${proposalUnitPrice} per seat</strong>.`
-              : "a proposal based on a recommendation to convert free Copilot seats to paid licenses for <strong>14 customers</strong>."}</p>
+              ? `a customer-specific quote for <strong>${proposalCustomer}</strong> with <strong>${proposalSeats} seats</strong> at <strong>${proposalUnitPrice} per seat</strong>.`
+              : "a quote based on a recommendation to convert free Copilot seats to paid licenses for <strong>14 customers</strong>."}</p>
             <p>${isCustomerProposal
               ? "Review the distributor offer and decide how much reseller incentive benefit to pass to the customer."
               : "This is a reseller skeleton for Journey Innovations to review and customize before sharing it with customers."}</p>
@@ -1958,7 +1967,7 @@
       const closeProposal = () => {
         detail.remove();
       };
-      workspace.querySelector('[aria-label="Close proposal"]').addEventListener("click", closeProposal);
+      workspace.querySelector(`[aria-label="Close ${outboundArtifact}"]`).addEventListener("click", closeProposal);
       workspace.querySelector(".demo-gcps-document-close").addEventListener("click", () => {
         workspace.classList.add("document-closed");
         showStatus("Proposal artifacts closed. Continue refining the proposal in this chat.");
@@ -2070,7 +2079,7 @@
         `,
         `
           <p>COMMERCIAL VIEW</p><h1>Investment snapshot</h1>
-          <div class="demo-proposal-lead">Replace every placeholder with validated commercial information before sharing this proposal.</div>
+          <div class="demo-proposal-lead">Replace every placeholder with validated commercial information before sharing this ${outboundArtifact}.</div>
           <h3>Illustrative investment comparison</h3>
           <table><thead><tr><th>Investment item</th><th>Current</th><th>Proposed</th><th>Notes</th></tr></thead>
           <tbody>
@@ -2089,9 +2098,9 @@
           <div class="demo-proposal-lead">Use this playbook to turn the recommendation into a coordinated customer engagement.</div>
           <h3>Execution steps</h3>
           <div class="demo-execution-steps">
-            <div><b>1</b><strong>Review proposal pack</strong><span>Complete within 3 days · distributor</span></div>
+            <div><b>1</b><strong>Review ${outboundArtifact} pack</strong><span>Complete within 3 days · distributor</span></div>
             <div><b>2</b><strong>Schedule ${customer} ROI discussion</strong><span>Complete within 10 days · distributor</span></div>
-            <div><b>3</b><strong>Send customer proposal + FAQ + ROI deck</strong><span>Complete within 14 days · distributor</span></div>
+            <div><b>3</b><strong>Send ${outboundArtifact} + FAQ + ROI deck</strong><span>Complete within 14 days · distributor</span></div>
             <div><b>4</b><strong>Checkpoint on attach progress</strong><span>Complete within 30 days · joint</span></div>
           </div>
           <h3>Before customer review</h3>
@@ -2101,7 +2110,7 @@
           <p>PARTNER STORY</p><h1>Your partner narrative</h1>
           <div class="demo-proposal-lead">Customize this page with a concise, evidence-based explanation of why the partner is positioned to deliver.</div>
           <h3>Value proposition</h3>
-          <p class="demo-proposal-copy">Develop a Copilot monetization proposal for this customer. Focus on paid conversion readiness, expected ROI in the first 90 days, adoption milestones, and a clear path to send the proposal directly to the end customer.</p>
+          <p class="demo-proposal-copy">Develop a Copilot monetization ${outboundArtifact} for this customer. Focus on paid conversion readiness, expected ROI in the first 90 days, adoption milestones, and a clear path to send the ${outboundArtifact} to the intended recipient.</p>
           <h3>Delivery approach</h3><p class="demo-proposal-placeholder">[Partner methodology]</p>
           <h3>Relevant experience</h3><p class="demo-proposal-placeholder">[Partner proof points]</p>
           <h3>Recommended customer next step</h3><p class="demo-proposal-placeholder">[Partner recommended next step]</p>
@@ -2263,7 +2272,11 @@
         return;
       }
       const customer = card.querySelector("h3").textContent.trim();
-      const sentProposal = isJane || isPaul ? getCustomerProposal(customer) : null;
+      const sentProposal = isJane && recipientContext
+        ? null
+        : isJane || isPaul
+          ? getCustomerProposal(customer)
+          : null;
       const facts = [...card.querySelectorAll(".demo-customer-recommendation-facts span")];
       const quantityText = facts.find((fact) => fact.textContent.includes("Recommended quantity"))
         ?.querySelector("strong")?.textContent || "0";
@@ -2469,7 +2482,7 @@
         `}
         <div class="demo-deal-actions">
           ${sentProposal ? `<button type="button" data-action="sent-proposal">${isJane ? "See sent proposal" : "See sent quote"}</button>` : ""}
-          <button type="button" data-action="proposal">${isJane ? sentProposal ? "Send revised customer proposal" : "Create customer proposal" : sentProposal ? "Send revised reseller quote" : "Send reseller quote"}</button>
+          <button type="button" data-action="proposal">${isJane ? sentProposal ? "Send revised customer proposal" : "Send customer proposal" : sentProposal ? "Send revised reseller quote" : "Send reseller quote"}</button>
           <button type="button" data-action="transact">${isJane ? "Signal distributor for transact" : "Transact"}</button>
         </div>
         <div class="demo-transaction-status" hidden></div>
@@ -2973,6 +2986,10 @@
       if (["Create reseller customer proposal", "Prepare reseller quote"].includes(button.textContent.trim())) {
         openGcpsProposalWorkspace();
       }
+      if (button.dataset.action === "prepare-offer") {
+        const card = button.closest(".demo-customer-recommendation");
+        addDealEditor(card);
+      }
       if (button.dataset.janeProposalAction === "skeleton") {
         const proposal = getJourneyProposal();
         openGcpsProposalWorkspace({
@@ -3045,23 +3062,23 @@
     detail.className = "demo-journey-recommendation demo-jane-proposal-chat";
     detail.innerHTML = `
       <header class="demo-journey-chat-header">
-        <div><span>✣</span><div><strong>Partner Agent</strong><small>Journey Innovations · Proposal received</small></div></div>
-        <button class="demo-journey-close" type="button" aria-label="Close proposal conversation">×</button>
+        <div><span>✣</span><div><strong>Partner Agent</strong><small>Journey Innovations · Quote received</small></div></div>
+        <button class="demo-journey-close" type="button" aria-label="Close quote conversation">×</button>
       </header>
       <div class="demo-journey-thread">
-        <div class="demo-user-prompt">Show me the proposal Fabrikam sent to Journey Innovations.</div>
+        <div class="demo-user-prompt">Show me the quote Fabrikam sent to Journey Innovations.</div>
         <div class="demo-assistant-label">✣ Partner Agent</div>
         <article class="demo-jane-proposal-message">
-          <span class="demo-jane-proposal-badge">PROPOSAL FROM FABRIKAM</span>
-          <h1>Sarah has sent you a Monetize Copilot proposal${isCustomerProposal ? ` for ${proposal.customer}` : ""}</h1>
+          <span class="demo-jane-proposal-badge">QUOTE FROM FABRIKAM</span>
+          <h1>Sarah has sent you a Monetize Copilot quote${isCustomerProposal ? ` for ${proposal.customer}` : ""}</h1>
           <p><strong>Sarah from Fabrikam</strong> sent you ${isCustomerProposal
-            ? `a customer-specific proposal for <strong>${proposal.customer}</strong> with <strong>${proposalSeats} seats</strong> at <strong>${proposalPrice} per seat</strong>.`
-            : "a proposal regarding a recommendation to convert free Copilot seats to paid licenses for <strong>14 customers</strong>."}</p>
+            ? `a customer-specific quote for <strong>${proposal.customer}</strong> with <strong>${proposalSeats} seats</strong> at <strong>${proposalPrice} per seat</strong>.`
+            : "a quote regarding a recommendation to convert free Copilot seats to paid licenses for <strong>14 customers</strong>."}</p>
           <p>${isCustomerProposal
             ? "Review Fabrikam’s distributor offer, your fixed reseller incentives, and how much incentive benefit to pass to the customer."
-            : "You can review the reseller skeleton proposal or explore the customers included in the recommendation."}</p>
+            : "You can review the reseller quote or explore the customers included in the recommendation."}</p>
           <div class="demo-jane-proposal-actions">
-            <button type="button" data-jane-proposal-action="skeleton">View proposal</button>
+            <button type="button" data-jane-proposal-action="skeleton">View quote</button>
             <button type="button" data-jane-proposal-action="customers">${isCustomerProposal ? "View customer deal details" : "View customer details"}</button>
           </div>
         </article>

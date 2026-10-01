@@ -71,12 +71,12 @@ function applyHomePersona() {
   document.getElementById("priorityTitle").textContent =
     "Turn new partner opportunities into growth";
   document.getElementById("priorityDescription").textContent =
-    "Review proposals from your partner network and decide where Journey Innovations should engage next.";
+    "Review quotes from your partner network and decide where Journey Innovations should engage next.";
   document.querySelector("#priorityBriefing .step").textContent = "1 new";
 
   document.getElementById("growCount").textContent = "3";
   document.getElementById("growDescription").textContent =
-    "Review partner proposals and pursue new opportunities";
+    "Review partner quotes and pursue new opportunities";
   document.querySelectorAll(".eric-grow-card").forEach((card) => {
     card.hidden = true;
   });
@@ -87,13 +87,13 @@ function applyHomePersona() {
       `${proposal.status || "NEW"} · FROM ${proposal.sender || "FABRIKAM"}`;
     proposalCard.querySelector("h3").textContent =
       proposal.customer
-        ? `${proposal.sender || "Fabrikam"} sent a proposal for ${proposal.customer}`
-        : `${proposal.sender || "Fabrikam"} created a proposal for you`;
+        ? `${proposal.sender || "Fabrikam"} sent a quote for ${proposal.customer}`
+        : `${proposal.sender || "Fabrikam"} created a quote for you`;
     proposalCard.querySelector("p").textContent = proposal.customer
       ? `${proposal.seatCount || proposal.seats} ${proposal.product || "Microsoft 365 Copilot"} seats at ${proposal.unitPrice} per seat.`
-      : "Review Fabrikam's proposal to partner with Journey Innovations on a new customer growth opportunity.";
+      : "Review Fabrikam's quote for a new customer growth opportunity.";
     proposalCard.querySelector(".card-detail").lastChild.textContent =
-      ` ${proposal.customer ? "Customer-specific proposal" : proposal.opportunity || "New customer growth opportunity"}`;
+      ` ${proposal.customer ? "Customer-specific quote" : proposal.opportunity || "New customer growth opportunity"}`;
   }
   document.querySelectorAll(".jane-grow-card").forEach((card) => {
     card.hidden = false;
