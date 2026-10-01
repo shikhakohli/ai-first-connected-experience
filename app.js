@@ -101,7 +101,45 @@ function applyHomePersona() {
   document.getElementById("ericCascadedGoal").hidden = true;
 }
 
+function applyChrisHomePersona() {
+  if (!personaButton || selectedPersona !== "paul") return;
+
+  document.title = "Partner Center | Apex Partners";
+  personaButton.textContent = "C";
+  document.getElementById("currentPersonaName").textContent = "Chris";
+  document.getElementById("currentPersonaRole").textContent =
+    "Incentive manager · Apex Partners";
+  document.getElementById("switchToEric").hidden = false;
+  document.getElementById("switchToPaul").hidden = true;
+
+  document.getElementById("welcomeTitle").textContent = "Hi, Chris";
+  document.getElementById("welcomeSubtitle").textContent =
+    "Start with the actions that can unlock more value for Apex Partners.";
+  document.getElementById("organizationLogo").textContent = "AP";
+  document.getElementById("organizationName").textContent = "Apex Partners";
+  document.getElementById("organizationRole").textContent = "Incentive manager";
+  document.getElementById("customerNavLink").href =
+    "./alliance-manager/current-113.html?persona=paul&view=customer";
+
+  document.getElementById("priorityTitle").textContent =
+    "Unlock Apex Partners' CSP incentive potential";
+  document.getElementById("priorityDescription").textContent =
+    "Close the Data & AI Solutions Partner designation gap and become eligible for additional CSP incentives.";
+  document.querySelector("#priorityBriefing .step").textContent = "Action required";
+
+  document.getElementById("growCount").textContent = "1";
+  document.getElementById("growDescription").textContent =
+    "Complete your designation and unlock incentives";
+  document.querySelectorAll(".eric-grow-card, .jane-grow-card").forEach((card) => {
+    card.hidden = true;
+  });
+  document.getElementById("janeProposalCard").hidden = true;
+  document.getElementById("chrisDesignationCard").hidden = false;
+  document.getElementById("ericCascadedGoal").hidden = true;
+}
+
 applyHomePersona();
+applyChrisHomePersona();
 
 function addHomeDismissControls() {
   const persona = selectedPersona || "eric";
@@ -393,8 +431,11 @@ document.getElementById("switchToJane")?.addEventListener("click", () => {
   window.location.href = "./?persona=jane";
 });
 document.getElementById("switchToPaul")?.addEventListener("click", () => {
+  window.location.href = "./?persona=paul";
+});
+document.getElementById("reviewDesignation")?.addEventListener("click", () => {
   window.location.href =
-    `./alliance-manager/current-113.html?persona=paul&view=home&fresh=${Date.now()}`;
+    "./alliance-manager/current-113.html?persona=paul&view=benefits&journey=designation";
 });
 document.getElementById("reviewProposal")?.addEventListener("click", () => {
   window.location.href =

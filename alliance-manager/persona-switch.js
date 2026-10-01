@@ -14,6 +14,7 @@
   }
 
   const selectedPersona = new URLSearchParams(window.location.search).get("persona");
+  const requestedJourney = new URLSearchParams(window.location.search).get("journey");
   const isEric = selectedPersona === "eric";
   const isJane = selectedPersona === "jane";
   const isPaul = selectedPersona === "paul";
@@ -161,6 +162,15 @@
     return amount;
   };
 
+  const renderShareSlider = (attributes) => `
+    <div class="demo-range-control">
+      <input type="range" min="0" max="100" step="1" value="50" ${attributes} />
+      <div class="demo-range-scale" aria-hidden="true">
+        <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+      </div>
+    </div>
+  `;
+
   const getCustomerTransactionId = (customer) =>
     `customer:${String(customer || "").trim().toLowerCase()}`;
 
@@ -173,17 +183,17 @@
   menu.hidden = true;
   const currentPersonaName = isEric ? "Eric" : isJane ? "Karin" : isPaul ? "Chris" : "Sarah";
   const currentPersonaRole = isEric
-    ? "CFO · Fabrikam"
+    ? "Global alliance manager · Fabrikam"
     : isJane
       ? "Growth lead · Journey Innovations"
       : isPaul
-        ? "Alliance manager · Apex Partners · CSP Direct Partner"
+        ? "Incentive manager · Apex Partners · CSP Direct Partner"
         : "Alliance manager · United States";
   const personaOptions = [
     !isEric && `
       <button class="demo-persona-option" type="button" data-persona="eric">
         <span class="demo-persona-avatar">E</span>
-        <span><strong>Eric</strong><small>CFO · Fabrikam</small></span>
+        <span><strong>Eric</strong><small>Global alliance manager · Fabrikam</small></span>
       </button>
     `,
     !isJane && `
@@ -195,7 +205,7 @@
     !isPaul && `
       <button class="demo-persona-option" type="button" data-persona="paul">
         <span class="demo-persona-avatar">C</span>
-        <span><strong>Chris</strong><small>Alliance manager · Apex Partners</small></span>
+        <span><strong>Chris</strong><small>Incentive manager · Apex Partners</small></span>
       </button>
     `,
     selectedPersona !== "sarah" && `
@@ -331,7 +341,7 @@
     card.innerHTML = `
       <div class="demo-goal-icon">🎯</div>
       <div class="demo-goal-content">
-        <div class="demo-goal-eyebrow">NEW ORGANIZATION GOAL · FROM ERIC, CFO</div>
+        <div class="demo-goal-eyebrow">NEW ORGANIZATION GOAL · FROM ERIC, GLOBAL ALLIANCE MANAGER</div>
         <strong>Fabrikam’s FY27 goals are ready for your market</strong>
         <p>${createGoalSummary(plan.goals)}</p>
         <div class="demo-goal-actions">
@@ -1171,7 +1181,7 @@
   });
   restrictJaneAddMenu();
 
-  if (isEric || isJane) {
+  if (isEric || isJane || isPaul) {
     document.addEventListener(
       "click",
       (event) => {
@@ -1183,10 +1193,100 @@
         event.stopPropagation();
         window.location.href = isJane
           ? "../index.html?persona=jane&v=26"
-          : "../index.html";
+          : isPaul
+            ? "../index.html?persona=paul"
+            : "../index.html";
       },
       true,
     );
+  }
+
+  const openDesignationJourney = () => {
+    if (!isPaul || requestedJourney !== "designation") return false;
+    if (document.querySelector(".demo-designation-chat")) return true;
+    if (!document.getElementById("root")?.children.length) return false;
+
+    const experience = document.createElement("section");
+    experience.className = "demo-designation-chat";
+    experience.innerHTML = `
+      <header class="demo-designation-header">
+        <div>
+          <span class="demo-designation-agent-icon">✣</span>
+          <div><strong>Partner Agent</strong><small>Apex Partners · Benefits and designations</small></div>
+        </div>
+        <button type="button" aria-label="Close designation recommendations">×</button>
+      </header>
+      <div class="demo-designation-thread">
+        <div class="demo-user-prompt">Why is Apex Partners missing CSP incentives, and what should I do next?</div>
+        <div class="demo-assistant-label">✣ Partner Agent</div>
+        <article class="demo-designation-summary">
+          <span class="demo-designation-eyebrow">CSP INCENTIVE ELIGIBILITY</span>
+          <h1>Apex Partners is missing the Data &amp; AI Solutions Partner designation</h1>
+          <p>Your current designation score is <strong>68 out of 100</strong>. The qualification threshold is <strong>70 points</strong>, so Apex Partners needs <strong>2 more points</strong> to qualify and unlock the related CSP incentive opportunity.</p>
+          <div class="demo-designation-score">
+            <div><span>Current score</span><strong>68</strong></div>
+            <div class="demo-score-track"><i></i><b>70-point threshold</b></div>
+            <div><span>Points needed</span><strong>2</strong></div>
+          </div>
+        </article>
+        <div class="demo-assistant-label">✣ Partner Agent</div>
+        <article class="demo-designation-recommendations">
+          <div class="demo-designation-intro">
+            <div><span class="demo-designation-eyebrow">RECOMMENDED PATHS</span><h2>Two ways to close the designation gap</h2></div>
+            <span>Prioritized by time to qualification</span>
+          </div>
+          <section class="demo-designation-path recommended">
+            <div class="demo-path-number">1</div>
+            <div>
+              <div class="demo-path-heading">
+                <div><span>Performance</span><h3>Increase qualifying net customer adds</h3></div>
+                <strong>Up to 10 points per customer</strong>
+              </div>
+              <p>These customers are closest to the qualifying Azure consumed revenue threshold. Helping any one of them cross the threshold would move Apex Partners above 70 points.</p>
+              <div class="demo-designation-customers">
+                <article><div><strong>Northwind Traders</strong><span>Tenant 8F32-41C8</span></div><dl><div><dt>Current ACR</dt><dd>$468</dd></div><div><dt>Target</dt><dd>$500</dd></div><div><dt>Gap</dt><dd>$32</dd></div></dl><small>Recommended: Azure optimization workshop</small></article>
+                <article><div><strong>Alpine Ski House</strong><span>Tenant 7A21-90D4</span></div><dl><div><dt>Current ACR</dt><dd>$482</dd></div><div><dt>Target</dt><dd>$500</dd></div><div><dt>Gap</dt><dd>$18</dd></div></dl><small>Recommended: Expand production workload</small></article>
+                <article><div><strong>Fourth Coffee</strong><span>Tenant 1C64-73B9</span></div><dl><div><dt>Current ACR</dt><dd>$441</dd></div><div><dt>Target</dt><dd>$500</dd></div><div><dt>Gap</dt><dd>$59</dd></div></dl><small>Recommended: Migrate analytics workload</small></article>
+              </div>
+            </div>
+          </section>
+          <section class="demo-designation-path">
+            <div class="demo-path-number">2</div>
+            <div>
+              <div class="demo-path-heading">
+                <div><span>Skilling</span><h3>Add an intermediate certification</h3></div>
+                <strong>4 points per certified individual</strong>
+              </div>
+              <p>Apex Partners currently has <strong>7 certified individuals</strong> and <strong>28 of 40 skilling points</strong>. One additional qualifying certification would add 4 points and take the organization to 72 overall points.</p>
+              <div class="demo-certification-plan">
+                <div><span>Recommended candidates</span><strong>3 employees with prerequisite training complete</strong></div>
+                <div><span>Eligible certifications</span><strong>Azure Data Engineer Associate · Azure AI Engineer Associate · Fabric Analytics Engineer Associate</strong></div>
+                <div><span>Projected result</span><strong>72 points · Designation qualified</strong></div>
+              </div>
+            </div>
+          </section>
+          <div class="demo-designation-next">
+            <span>✣</span>
+            <div><strong>Partner Agent recommendation</strong><p>Prioritize Alpine Ski House for the fastest customer-add path, while enrolling one employee in an intermediate certification to create a second route to qualification.</p></div>
+          </div>
+        </article>
+      </div>
+    `;
+    experience.querySelector("header button").addEventListener("click", () => {
+      window.location.href = "../index.html?persona=paul";
+    });
+    document.body.appendChild(experience);
+    return true;
+  };
+
+  if (!openDesignationJourney()) {
+    const designationObserver = new MutationObserver(() => {
+      if (openDesignationJourney()) designationObserver.disconnect();
+    });
+    designationObserver.observe(document.getElementById("root"), {
+      childList: true,
+      subtree: true,
+    });
   }
 
   const enhanceCustomerOverview = () => {
@@ -2247,7 +2347,7 @@
               ].map(([key, label]) => `
                 <div class="${key === "total" ? "total" : ""}" data-benefit-share-row="${key}">
                   <div><strong>${label}</strong><output data-benefit-total="${key}"></output></div>
-                  <input type="range" min="0" max="100" step="1" value="50" data-benefit-share="${key}" aria-label="${label} percentage kept by partner" />
+                  ${renderShareSlider(`data-benefit-share="${key}" aria-label="${label} percentage kept by partner"`)}
                   <small><span data-benefit-kept="${key}"></span><span data-benefit-passed="${key}"></span></small>
                 </div>
               `).join("")}
@@ -2294,7 +2394,7 @@
             <div class="demo-benefit-sharing">
               <div class="total" data-reseller-share-row>
                 <div><strong>Total incentives</strong><output data-reseller-incentive-total></output></div>
-                <input type="range" min="0" max="100" step="1" value="50" data-reseller-incentive-share aria-label="Incentive percentage kept by Journey Innovations" />
+                ${renderShareSlider('data-reseller-incentive-share aria-label="Incentive percentage kept by Journey Innovations"')}
                 <small><span data-reseller-incentive-kept></span><span data-reseller-incentive-passed></span></small>
               </div>
             </div>

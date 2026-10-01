@@ -244,12 +244,14 @@ main { flex: 1; min-width: 0; padding: 36px clamp(24px, 4vw, 64px) 70px; }
 .proposal-icon { color: #8a3700; background: #fff1e8; }
 .migration-icon { color: #a4262c; background: #fff4ce; }
 .pipeline-icon { color: #0f6cbd; background: #e8f3ff; }
+.designation-icon { color: #8a3700; background: #fff4ce; }
 .card-meta { margin: 1px 0 4px; font-size: 9px; }
 .card-copy h3, .goal-card h3, .manage-item h3 { margin: 0; font-size: 14px; font-weight: 650; }
 .card-copy > p { min-height: 36px; margin: 5px 0 8px; color: #5e5e5e; font-size: 11px; line-height: 1.5; }
 .card-detail { display: flex; align-items: center; gap: 6px; color: #666; font-size: 10px; }
 .status-dot { width: 6px; height: 6px; background: #107c10; border-radius: 50%; }
 .status-dot.blue { background: #0f6cbd; }
+.status-dot.amber { background: #d83b01; }
 .primary-action, .secondary-action { grid-column: 2; justify-self: start; margin-top: 2px; padding: 7px 11px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: 650; }
 .primary-action { color: #fff; background: #6b36a0; }
 .card-button { border: 0; cursor: pointer; }
@@ -257,6 +259,11 @@ main { flex: 1; min-width: 0; padding: 36px clamp(24px, 4vw, 64px) 70px; }
   border-color: #e3b28d;
   border-left-color: #d83b01;
   background: linear-gradient(120deg, #fff8f3, #fff);
+}
+.designation-card {
+  border-color: #e5c365;
+  border-left-color: #d83b01;
+  background: linear-gradient(120deg, #fff8e8, #fff);
 }
 .scenario-value {
   margin-top: 9px;
