@@ -2327,7 +2327,8 @@
               <span>Program percentages are fixed and not editable</span>
             </div>
             <label class="demo-cocp-field">Is COCP applicable?
-              <select data-field="cocp" disabled aria-disabled="true"><option selected>No</option></select>
+              <input data-field="cocp" type="hidden" value="No" />
+              <strong class="demo-readonly-value">No</strong>
             </label>
             <div class="demo-benefit-rate-table">
               <div><span>Core · FY27</span><strong data-incentive-rate-label="core">2%</strong><output data-incentive="core"></output></div>
