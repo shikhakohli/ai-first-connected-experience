@@ -285,7 +285,7 @@
         return;
       }
       if (persona === "paul") {
-        window.location.href = `./current-113.html?persona=paul&view=home&fresh=${Date.now()}`;
+        window.location.href = "../index.html?persona=paul&v=82";
         return;
       }
       window.location.href = persona === "sarah"
