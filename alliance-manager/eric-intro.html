@@ -4,15 +4,38 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Meet Eric | AI First Customer Experience</title>
-    <link rel="stylesheet" href="./persona-intro.css?v=2" />
+    <link rel="stylesheet" href="../app.css?v=25" />
+    <link rel="stylesheet" href="./persona-intro.css?v=3" />
   </head>
   <body class="intro-body">
-    <a class="intro-back" href="../index.html">&larr; Back to the experience</a>
+    <header class="topbar">
+      <div class="brand"><strong>Microsoft</strong> Partner Center</div>
+      <div class="top-actions" style="margin-left:auto">
+        <div class="persona">
+          <button id="personaButton" class="avatar" aria-label="Account menu" aria-expanded="false">E</button>
+          <div id="personaMenu" class="persona-menu" hidden>
+            <div class="persona-current">
+              <strong>Eric</strong>
+              <span>Global alliance manager &middot; Fabrikam</span>
+            </div>
+            <a class="persona-intro-link" href="./current-113.html?persona=sarah&view=home">
+              <span class="small-avatar">S</span>
+              <span><strong>Sarah</strong><small>Switch to Sarah's experience</small></span>
+            </a>
+            <a class="persona-intro-link" href="../index.html?persona=jane&v=25">
+              <span class="small-avatar jane-avatar">K</span>
+              <span><strong>Karin</strong><small>Switch to Karin's experience</small></span>
+            </a>
+            <a class="persona-intro-link" href="../index.html?persona=paul&v=82">
+              <span class="small-avatar">C</span>
+              <span><strong>Chris</strong><small>Switch to Chris's experience</small></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
 
     <div class="intro-card" style="--intro-accent:#127682">
-      <div class="intro-step">
-        <span class="intro-step-label">SET DIRECTION</span>
-      </div>
       <img class="intro-photo" src="./assets/persona-photos/eric.png" alt="Eric" />
       <h2 class="intro-name">Eric</h2>
       <p class="intro-role">Global Alliance Manager</p>
@@ -33,21 +56,6 @@
       shapes a profitable growth plan at the executive level, then hands it off for the team to orchestrate &mdash;
       giving everyone downstream a confident, data-backed starting point.
     </div>
-
-    <div class="intro-journey">
-      <p class="intro-journey-title">THE CONNECTED GROWTH JOURNEY</p>
-      <a class="intro-journey-item active" href="./eric-intro.html">
-        <img src="./assets/persona-photos/eric.png" alt="" /><span>Eric &middot; Set direction</span>
-      </a>
-      <a class="intro-journey-item" href="./sarah-intro.html">
-        <img src="./assets/persona-photos/sarah.png" alt="" /><span>Sarah &middot; Orchestrate</span>
-      </a>
-      <a class="intro-journey-item" href="./karin-intro.html">
-        <img src="./assets/persona-photos/karin.png" alt="" /><span>Karin &middot; Convert demand</span>
-      </a>
-      <a class="intro-journey-item" href="./chris-intro.html">
-        <img src="./assets/persona-photos/chris.png" alt="" /><span>Chris &middot; Orchestrate</span>
-      </a>
-    </div>
+    <script src="./persona-topbar.js?v=1"></script>
   </body>
 </html>
