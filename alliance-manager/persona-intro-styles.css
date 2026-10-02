@@ -18,6 +18,10 @@
   width: 100%;
 }
 
+.persona-switch-link {
+  padding: 11px 13px !important;
+}
+
 .intro-card {
   position: relative;
   max-width: 420px;
