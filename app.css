@@ -90,6 +90,13 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .persona-menu button > span:last-child { display: flex; flex-direction: column; gap: 2px; }
 .persona-menu button strong { font-size: 12px; }
 .persona-menu button small { color: #616161; font-size: 10px; }
+.persona-intro-section { border-top: 1px solid #eee; padding: 10px 0 6px; }
+.persona-intro-heading { padding: 4px 13px 6px; color: #777; font-size: 10px; font-weight: 700; letter-spacing: .08em; }
+.persona-intro-link { width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 13px; color: #242424; text-decoration: none; box-sizing: border-box; }
+.persona-intro-link:hover { background: #f5f5f5; }
+.persona-intro-link > span:last-child { display: flex; flex-direction: column; gap: 2px; }
+.persona-intro-link strong { font-size: 12px; }
+.persona-intro-link small { color: #616161; font-size: 10px; }
 
 .shell { min-height: calc(100vh - 44px); display: flex; }
 .rail {
