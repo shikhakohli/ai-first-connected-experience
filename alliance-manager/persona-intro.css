@@ -7,47 +7,33 @@
   background: #faf9f8;
   color: #242424;
   font-family: "Segoe UI", Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .intro-back {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin: 20px 0 0 28px;
+  margin: 20px auto 0;
   color: #0070c0;
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
+  align-self: center;
 }
 
 .intro-back:hover {
   text-decoration: underline;
 }
 
-.intro-header {
-  padding: 18px 28px 6px;
-}
-
-.intro-header h1 {
-  margin: 0;
-  color: #0b2d4d;
-  font-size: 30px;
-  font-weight: 800;
-  letter-spacing: -0.2px;
-}
-
-.intro-header p {
-  margin: 6px 0 0;
-  max-width: 720px;
-  color: #4a4a4a;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
 .intro-card {
   position: relative;
   max-width: 420px;
-  margin: 28px 28px 0;
+  width: 100%;
+  margin: 28px auto 0;
   padding: 28px 26px 26px;
   background: #fff;
   border: 1px solid #f0f0f0;
@@ -60,20 +46,9 @@
 .intro-step {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 7px;
   margin-bottom: 18px;
-}
-
-.intro-step-number {
-  width: 22px;
-  height: 22px;
-  display: grid;
-  place-items: center;
-  color: #fff;
-  background: var(--intro-accent, #127682);
-  border-radius: 50%;
-  font-size: 11px;
-  font-weight: 700;
 }
 
 .intro-step-label {
@@ -125,7 +100,7 @@
 .intro-section {
   margin-top: 18px;
   padding: 14px 16px;
-  text-align: left;
+  text-align: center;
   border-radius: 10px;
 }
 
@@ -154,7 +129,8 @@
 
 .intro-narrative {
   max-width: 420px;
-  margin: 20px 28px 0;
+  width: 100%;
+  margin: 20px auto 0;
   padding: 18px 20px;
   color: #3b3b3b;
   font-size: 13px;
@@ -162,14 +138,18 @@
   background: #fff;
   border: 1px solid #f0f0f0;
   border-radius: 10px;
+  text-align: center;
 }
 
 .intro-journey {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 14px;
-  margin: 28px 28px 32px;
+  margin: 28px auto 32px;
   padding: 18px;
+  max-width: 720px;
+  width: 100%;
   background: #fff;
   border: 1px solid #f0f0f0;
   border-radius: 12px;
@@ -182,6 +162,7 @@
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;
+  text-align: center;
 }
 
 .intro-journey-item {
