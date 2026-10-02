@@ -218,8 +218,8 @@
   const personaIntroLinks = [
     ["eric", "E", "Eric", "Global alliance manager introduction", "./eric-intro.html"],
     ["sarah", "S", "Sarah", "Alliance manager introduction", "./sarah-intro.html"],
-    ["paul", "C", "Chris", "Incentive manager introduction", "./chris-intro.html"],
     ["jane", "K", "Karin", "Sales manager introduction", "./karin-intro.html"],
+    ["paul", "C", "Chris", "Incentive manager introduction", "./chris-intro.html"],
   ]
     .map(
       ([persona, initial, name, role, href]) => `

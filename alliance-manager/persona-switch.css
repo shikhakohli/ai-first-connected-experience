@@ -109,6 +109,15 @@
   gap: 2px;
 }
 
+.demo-persona-intro-link strong {
+  font-size: 12px;
+}
+
+.demo-persona-intro-link small {
+  color: #616161;
+  font-size: 10px;
+}
+
 .demo-jane-account {
   position: relative !important;
   z-index: 1001 !important;
