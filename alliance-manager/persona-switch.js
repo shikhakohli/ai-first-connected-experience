@@ -1695,7 +1695,7 @@
                 <button class="demo-gcps-download" type="button" data-gcps-action="download">Download documents</button>
                 ${isJane || isPaul
                   ? '<button class="demo-gcps-send" type="button" data-gcps-action="send-customer">Send to customer</button>'
-                  : '<button class="demo-gcps-send" type="button" data-gcps-action="send-reseller">Send to reseller</button>'}
+                  : '<button class="demo-gcps-send" type="button" data-gcps-action="send-reseller">Prepare for reseller</button>'}
               </div>
             </footer>
           </main>
