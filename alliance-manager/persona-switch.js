@@ -2502,7 +2502,7 @@
         `}
         <div class="demo-deal-actions">
           ${sentProposal ? `<button type="button" data-action="sent-proposal">${isJane ? "See sent proposal" : "See sent quote"}</button>` : ""}
-          <button type="button" data-action="proposal">${isJane ? sentProposal ? "Send revised customer proposal" : "Send customer proposal" : sentProposal ? "Send revised reseller quote" : "Send reseller quote"}</button>
+          <button type="button" data-action="proposal">${isJane ? sentProposal ? "Send revised customer proposal" : "Send customer proposal" : isPaul ? sentProposal ? "Send revised reseller quote" : "Send reseller quote" : sentProposal ? "Prepare revised reseller quote" : "Prepare reseller quote"}</button>
           <button type="button" data-action="transact">${isJane ? "Signal distributor for transact" : "Transact"}</button>
         </div>
         <div class="demo-transaction-status" hidden></div>
