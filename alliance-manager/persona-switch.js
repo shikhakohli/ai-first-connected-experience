@@ -215,12 +215,32 @@
       </button>
     `,
   ].filter(Boolean).join("");
+  const personaIntroLinks = [
+    ["eric", "E", "Eric", "CFO introduction", "./eric-intro.html"],
+    ["sarah", "S", "Sarah", "Alliance manager introduction", "./sarah-intro.html"],
+    ["paul", "C", "Chris", "Alliance manager introduction", "./chris-intro.html"],
+    ["jane", "K", "Karin", "Sales manager introduction", "./karin-intro.html"],
+  ]
+    .map(
+      ([persona, initial, name, role, href]) => `
+      <a class="demo-persona-intro-link" href="${href}" data-persona="${persona}">
+        <span class="demo-persona-avatar${persona === "jane" ? " demo-jane-avatar" : ""}">${initial}</span>
+        <span><strong>${name}</strong><small>${role}</small></span>
+      </a>
+    `,
+    )
+    .join("");
+
   menu.innerHTML = `
     <div class="demo-persona-current">
       <strong>${currentPersonaName}</strong>
       <span>${currentPersonaRole}</span>
     </div>
     ${personaOptions}
+    <div class="demo-persona-intro-section">
+      <div class="demo-persona-intro-heading">MEET THE TEAM</div>
+      ${personaIntroLinks}
+    </div>
   `;
   document.body.appendChild(menu);
 

@@ -75,6 +75,40 @@
   background: linear-gradient(135deg, #d83b01, #c239b3);
 }
 
+.demo-persona-intro-section {
+  border-top: 1px solid #eee;
+  padding: 10px 0 6px;
+}
+
+.demo-persona-intro-heading {
+  padding: 4px 13px 6px;
+  color: #777;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.demo-persona-intro-link {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 13px;
+  color: #242424;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.demo-persona-intro-link:hover {
+  background: #f5f5f5;
+}
+
+.demo-persona-intro-link > span:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .demo-jane-account {
   position: relative !important;
   z-index: 1001 !important;
