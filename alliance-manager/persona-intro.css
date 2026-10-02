@@ -13,6 +13,11 @@
   text-align: center;
 }
 
+.intro-body > .topbar {
+  align-self: stretch;
+  width: 100%;
+}
+
 .intro-card {
   position: relative;
   max-width: 420px;

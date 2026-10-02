@@ -216,9 +216,9 @@
     `,
   ].filter(Boolean).join("");
   const personaIntroLinks = [
-    ["eric", "E", "Eric", "CFO introduction", "./eric-intro.html"],
+    ["eric", "E", "Eric", "Global alliance manager introduction", "./eric-intro.html"],
     ["sarah", "S", "Sarah", "Alliance manager introduction", "./sarah-intro.html"],
-    ["paul", "C", "Chris", "Alliance manager introduction", "./chris-intro.html"],
+    ["paul", "C", "Chris", "Incentive manager introduction", "./chris-intro.html"],
     ["jane", "K", "Karin", "Sales manager introduction", "./karin-intro.html"],
   ]
     .map(
