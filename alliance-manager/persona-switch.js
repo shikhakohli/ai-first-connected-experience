@@ -1,18 +1,4 @@
 (() => {
-  if (performance.getEntriesByType("navigation")[0]?.type === "reload") {
-    [
-      "fabrikam-published-goals",
-      "fabrikam-inherited-goal-choice",
-      "fabrikam-eric-personal-goal",
-      "journey-innovations-goal-choice",
-      "apex-partners-goal-choice",
-      "apex-partners-customer-proposals",
-      "journey-innovations-transaction-signal",
-      "fabrikam-sarah-completed-transactions",
-    ].forEach((key) => localStorage.removeItem(key));
-    sessionStorage.removeItem("show-fabrikam-inherited-goal");
-  }
-
   const selectedPersona = new URLSearchParams(window.location.search).get("persona");
   const requestedJourney = new URLSearchParams(window.location.search).get("journey");
   const isEric = selectedPersona === "eric";
@@ -36,7 +22,11 @@
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
   const sarahCompletedTransactionsKey = "fabrikam-sarah-completed-transactions";
-  const buildVersion = "154";
+  const buildVersion = "163";
+  const isSarah = !isEric && !isJane && !isPaul;
+  const isSeatAddGoal = (goal) =>
+    /\bNPSA\b|net paid seats?(?: adds?)?|paid seat adds?/i.test(goal)
+    || (/copilot/i.test(goal) && /paid seats?|convert.*free.*to paid/i.test(goal));
   let janeDistributorFilter = "All distributors";
   let openCurrentProposalWorkspace = null;
 
@@ -579,6 +569,55 @@
       localStorage.removeItem(portfolioGoalChoiceKey);
     }
     const previousChoice = isEric ? null : previousGoalDecision?.choice;
+    const cascadedTargets = isSarah ? plan?.goalTargets || [] : [];
+    const getPortfolioTargets = () => {
+      const decision = JSON.parse(localStorage.getItem(portfolioGoalChoiceKey) || "null");
+      return cascadedTargets.map((target) =>
+        decision?.goalTargets?.find((saved) => saved.name === target.name) || target);
+    };
+    const createTargetEditor = (targets) => {
+      const form = document.createElement("form");
+      form.className = "demo-portfolio-target-editor";
+      const description = document.createElement("p");
+      description.textContent =
+        "Accept Eric's targets as-is, or adjust them for your portfolio. Organization targets will not change.";
+      form.appendChild(description);
+      targets.forEach((target, index) => {
+        const label = document.createElement("label");
+        label.textContent = `${target.name} (Eric's target: ${cascadedTargets[index].formattedValue})`;
+        const input = document.createElement("input");
+        input.type = "number";
+        input.min = "0";
+        input.step = "1";
+        input.required = true;
+        input.value = target.value;
+        input.setAttribute("aria-label", `Portfolio target for ${target.name}`);
+        label.appendChild(input);
+        form.appendChild(label);
+      });
+      return form;
+    };
+    const savePortfolioTargets = (form) => {
+      if (!form.reportValidity()) return false;
+      const inputs = [...form.querySelectorAll("input")];
+      const goalTargets = cascadedTargets.map((target, index) => {
+        const value = Number(inputs[index].value);
+        const formattedValue = target.sourceValue?.startsWith("$")
+          ? new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+            maximumFractionDigits: 0,
+          }).format(value)
+          : value.toLocaleString("en-US");
+        return { ...target, value, formattedValue };
+      });
+      localStorage.setItem(portfolioGoalChoiceKey, JSON.stringify({
+        choice: "accepted",
+        goals: plan.goals,
+        goalTargets,
+      }));
+      return true;
+    };
     const customerTitle = [...document.querySelectorAll("*")].find(
       (element) => element.children.length === 0 && element.textContent.trim() === "Customer overview",
     );
@@ -706,7 +745,7 @@
           : [goal];
       const progressLevels = [87, 74, 92, 68, 81];
       const copilotNpsaTarget = choice === "accepted"
-        ? plan?.goalTargets?.find(
+        ? (isSarah ? getPortfolioTargets() : plan?.goalTargets)?.find(
           (target) => /copilot/i.test(target.name)
             && /(NPSA|Net Paid Seat Adds)/i.test(target.name),
         )
@@ -718,8 +757,11 @@
         (sum, transaction) => sum + Number(transaction.seats || 0),
         0,
       );
-      const currentNpsaSeats = targetNpsaSeats
-        ? targetNpsaSeats * 0.54 + completedNpsaSeats
+      const originalNpsaTarget = plan?.goalTargets?.find(
+        (target) => target.name === copilotNpsaTarget?.name,
+      );
+      const currentNpsaSeats = copilotNpsaTarget
+        ? parseSeatValue(originalNpsaTarget?.value) * 0.54 + completedNpsaSeats
         : 0;
       const npsaProgress = targetNpsaSeats
         ? Math.round((currentNpsaSeats / targetNpsaSeats) * 100)
@@ -789,6 +831,7 @@
             ${isEric && hasFabrikamGoal ? '<button type="button" data-goal-action="remove-organization">Remove organization goals</button>' : ""}
             ${isEric && !hasFabrikamGoal ? '<button type="button" data-goal-action="set-organization">Set organization goals</button>' : ""}
             ${!isEric && hasFabrikamGoal && choice !== "accepted" ? '<button type="button" data-goal-action="apply-organization">Apply organization goal</button>' : ""}
+            ${isSarah && choice === "accepted" && cascadedTargets.length ? '<button type="button" data-goal-action="edit-targets">Edit goal targets</button>' : ""}
             <button type="button" data-goal-action="edit-personal">${choice === "own" ? "Edit custom goal" : "Set custom goal"}</button>
             ${choice === "own" ? '<button type="button" data-goal-action="remove-personal">Remove custom goal</button>' : ""}
             ${!isEric ? '<button type="button" data-goal-action="remove-goal">Remove goal</button>' : ""}
@@ -813,6 +856,38 @@
           <button class="demo-action-plan" type="button">📋 View detailed action plan →</button>
         </div>
       `;
+      if (isSarah && choice === "accepted" && cascadedTargets.length) {
+        const targets = getPortfolioTargets();
+        const targetSummary = document.createElement("p");
+        targetSummary.className = "demo-portfolio-target-summary";
+        targetSummary.textContent = targets.map((target) =>
+          `Your portfolio target: ${target.formattedValue} (${target.name})`).join(" · ");
+        panel.querySelector(".demo-goal-scope-summary").appendChild(targetSummary);
+        const targetEditor = createTargetEditor(targets);
+        targetEditor.hidden = true;
+        const save = document.createElement("button");
+        save.type = "submit";
+        save.textContent = "Save portfolio targets";
+        const cancel = document.createElement("button");
+        cancel.type = "button";
+        cancel.textContent = "Cancel";
+        cancel.addEventListener("click", () => {
+          targetEditor.hidden = true;
+        });
+        targetEditor.append(save, cancel);
+        panel.querySelector(".demo-goal-management").after(targetEditor);
+        panel.querySelector('[data-goal-action="edit-targets"]').addEventListener("click", () => {
+          targets.forEach((target, index) => {
+            targetEditor.querySelectorAll("input")[index].value = target.value;
+          });
+          targetEditor.hidden = false;
+          targetEditor.querySelector("input").focus();
+        });
+        targetEditor.addEventListener("submit", (event) => {
+          event.preventDefault();
+          if (savePortfolioTargets(targetEditor)) showActiveGoal(goal, "accepted");
+        });
+      }
       alignRecommendationsToGoals(activeGoals);
       const collapseButton = panel.querySelector('[data-goal-action="collapse"]');
       collapseButton.addEventListener("click", () => {
@@ -927,11 +1002,25 @@
       updateGoalEditor();
     };
 
+    const initialTargetEditor = isSarah && cascadedTargets.length
+      ? createTargetEditor(cascadedTargets)
+      : null;
+    if (initialTargetEditor) {
+      panel.querySelector(".demo-goal-choice-actions").before(initialTargetEditor);
+      initialTargetEditor.addEventListener("submit", (event) => {
+        event.preventDefault();
+        panel.querySelector('[data-choice="accept"]').click();
+      });
+    }
     panel.querySelector('[data-choice="accept"]')?.addEventListener("click", () => {
-      localStorage.setItem(portfolioGoalChoiceKey, JSON.stringify({
-        choice: "accepted",
-        goals: plan.goals,
-      }));
+      if (initialTargetEditor) {
+        if (!savePortfolioTargets(initialTargetEditor)) return;
+      } else {
+        localStorage.setItem(portfolioGoalChoiceKey, JSON.stringify({
+          choice: "accepted",
+          goals: plan.goals,
+        }));
+      }
       window.location.href =
         `./current-113.html?persona=sarah&view=customer&goalAccepted=${Date.now()}`;
     });
@@ -940,6 +1029,7 @@
     });
 
     panel.querySelector('[data-choice="own"]').addEventListener("click", () => {
+      if (initialTargetEditor) initialTargetEditor.hidden = true;
       panel.classList.add("editing");
       panel.querySelector(".demo-goal-choice-actions").hidden = true;
       panel.querySelector(".demo-own-goal-editor").hidden = false;
@@ -1315,6 +1405,64 @@
     });
   }
 
+  const updateSeatWhitespace = () => {
+    if (!isSarah) return;
+    let decision;
+    try {
+      decision = JSON.parse(localStorage.getItem(portfolioGoalChoiceKey) || "null");
+    } catch {
+      localStorage.removeItem(portfolioGoalChoiceKey);
+    }
+    const goals = decision?.choice === "accepted"
+      ? getPublishedPlan()?.goals || decision.goals || []
+      : decision?.choice === "own" ? [decision.goal] : [];
+    const showSeats = goals.some(isSeatAddGoal);
+    // Demo seat counts are independent opportunities, not revenue divided by a license price.
+    const seatOpportunities = new Map([
+      ["Journey Innovations", 7089],
+      ["Beta Partners", 3545],
+      ["Woodgrove", 0],
+      ["Contoso Customer 588", 935],
+      ["Delta Solutions", 897],
+      ["Contoso Customer 591", 817],
+      ["Contoso Customer 873", 783],
+      ["Contoso Customer 872", 768],
+      ["Contoso Customer 876", 766],
+      ["Copilot Monetization", 10634],
+      ["Copilot Acquisition", 3500],
+      ["Copilot Chat Activation", 0],
+    ]);
+    document.querySelectorAll("main .bg-white").forEach((card) => {
+      const revenueLabel = [...card.querySelectorAll("p")].find(
+        (paragraph) => /^(Additional revenue potential|Revenue potential)$/.test(
+          paragraph.textContent.trim(),
+        ),
+      );
+      if (!revenueLabel) return;
+      let metric = card.querySelector(".demo-seat-whitespace");
+      if (!showSeats || card.hidden) {
+        metric?.remove();
+        return;
+      }
+      const name = [...card.querySelectorAll("button, .text-\\[15px\\]")].map(
+        (element) => element.textContent.trim(),
+      ).find((text) => seatOpportunities.has(text));
+      if (!name) {
+        metric?.remove();
+        return;
+      }
+      const value = seatOpportunities.get(name).toLocaleString("en-US");
+      if (metric?.dataset.seats === value) return;
+      if (!metric) {
+        metric = document.createElement("div");
+        metric.className = "demo-seat-whitespace";
+        revenueLabel.nextElementSibling.after(metric);
+      }
+      metric.dataset.seats = value;
+      metric.innerHTML = `<span>Seat Whitespace</span><strong>${value} seats</strong>`;
+    });
+  };
+
   const enhanceCustomerOverview = () => {
     document.querySelectorAll("h2").forEach((heading) => {
       if (heading.textContent.trim() === "Top recommendations for you today across your resellers") {
@@ -1382,6 +1530,7 @@
         if (customerName) customerName.textContent = "Delta Solutions";
       }
     });
+    updateSeatWhitespace();
   };
 
   const customerOverviewObserver = new MutationObserver(enhanceCustomerOverview);

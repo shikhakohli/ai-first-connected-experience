@@ -5,17 +5,6 @@ const goalCard = document.getElementById("goalCard");
 const toast = document.getElementById("toast");
 const selectedPersona = new URLSearchParams(window.location.search).get("persona")?.toLowerCase();
 const journeyProposalKey = "fabrikam-journey-innovations-proposal";
-if (performance.getEntriesByType("navigation")[0]?.type === "reload") {
-  [
-    "fabrikam-published-goals",
-    "fabrikam-inherited-goal-choice",
-    "fabrikam-eric-personal-goal",
-    "journey-innovations-goal-choice",
-    "apex-partners-goal-choice",
-    "apex-partners-customer-proposals",
-  ].forEach((key) => localStorage.removeItem(key));
-  sessionStorage.removeItem("show-fabrikam-inherited-goal");
-}
 window.selectedGoalKeys = window.selectedGoalKeys || new Set();
 
 function showEricCascadedGoal() {
