@@ -22,7 +22,7 @@
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
   const sarahCompletedTransactionsKey = "fabrikam-sarah-completed-transactions";
-  const buildVersion = "163";
+  const buildVersion = "164";
   const isSarah = !isEric && !isJane && !isPaul;
   const isSeatAddGoal = (goal) =>
     /\bNPSA\b|net paid seats?(?: adds?)?|paid seat adds?/i.test(goal)
@@ -84,6 +84,15 @@
     try {
       const plan = JSON.parse(value);
       if (!Array.isArray(plan.goals) || !Array.isArray(plan.roles)) return null;
+      plan.goalTargets?.forEach((target) => {
+        if (Number.isFinite(target.value) && target.value >= 0) return;
+        const source = String(target.sourceValue || "").replace(/[$,\s]/g, "");
+        if (!/^\d+(?:\.\d+)?[MK]?$/.test(source)) return;
+        const multiplier = source.endsWith("M") ? 1_000_000 : source.endsWith("K") ? 1_000 : 1;
+        target.value = Math.round(Number.parseFloat(source) * multiplier);
+        target.formattedValue = `${target.sourceValue.startsWith("$") ? "$" : ""}${target.value.toLocaleString("en-US")}`;
+        target.restoredFromSource = true;
+      });
       return plan;
     } catch {
       localStorage.removeItem(publishedGoalKey);
@@ -593,6 +602,11 @@
         input.value = target.value;
         input.setAttribute("aria-label", `Portfolio target for ${target.name}`);
         label.appendChild(input);
+        if (target.restoredFromSource) {
+          const notice = document.createElement("small");
+          notice.textContent = `Missing cascaded target restored from source measure ${target.sourceValue}. Adjust it if needed.`;
+          label.appendChild(notice);
+        }
         form.appendChild(label);
       });
       return form;
