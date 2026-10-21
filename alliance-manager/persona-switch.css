@@ -692,51 +692,6 @@
   font-size: 10px;
 }
 
-.demo-portfolio-target-editor {
-  margin-top: 12px;
-  padding: 12px;
-  background: #f4f8fd;
-  border: 1px solid #c7dcf7;
-  border-radius: 6px;
-  font-size: 12px;
-}
-
-.demo-portfolio-target-editor[hidden] {
-  display: none;
-}
-
-.demo-goal-error {
-  margin-top: 10px;
-  color: #a4262c;
-  font-size: 12px;
-}
-
-.demo-portfolio-target-editor label {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.demo-portfolio-target-editor input {
-  width: 140px;
-  padding: 7px 9px;
-  border: 1px solid #9fc3ee;
-  border-radius: 4px;
-}
-
-.demo-portfolio-target-editor button {
-  margin: 10px 8px 0 0;
-  padding: 6px 9px;
-  color: #0f6cbd;
-  background: #fff;
-  border: 1px solid #9fc3ee;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
 .demo-seat-whitespace {
   display: flex;
   flex-wrap: wrap;

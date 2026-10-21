@@ -25404,30 +25404,6 @@ function Zs({
         }
     });
     let addMenuRef = (0, v.useRef)(null);
-    const pendingPortfolioGoal = (0, v.useRef)(null);
-    (0, v.useLayoutEffect)(() => {
-        const applyPortfolioGoal = event => {
-            const { title, onApplied } = event.detail || {};
-            if (typeof title !== `string` || !title.trim() || typeof onApplied !== `function`) return;
-            event.preventDefault();
-            pendingPortfolioGoal.current = onApplied;
-            setGoalDraft(title);
-            setSavedGoal({
-                title,
-                metric: `Primary portfolio goal`,
-                target: `Goal-aligned`,
-                date: `Active`
-            });
-        };
-        window.addEventListener(`portfolio-goal:set`, applyPortfolioGoal);
-        return () => window.removeEventListener(`portfolio-goal:set`, applyPortfolioGoal);
-    }, []);
-    (0, v.useLayoutEffect)(() => {
-        if (!savedGoal || !pendingPortfolioGoal.current) return;
-        const onApplied = pendingPortfolioGoal.current;
-        pendingPortfolioGoal.current = null;
-        onApplied();
-    }, [savedGoal]);
     (0, v.useEffect)(() => {
         if (!addMenuOpen) return;
         let e = e => {

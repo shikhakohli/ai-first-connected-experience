@@ -292,24 +292,13 @@ if (
   && new URLSearchParams(window.location.search).get("edit") === "1"
 ) {
   try {
-    const publishedPlan = JSON.parse(
+    const publishedGoals = JSON.parse(
       localStorage.getItem("fabrikam-published-goals") || "null",
-    );
-    const publishedGoals = publishedPlan?.goals || [];
+    )?.goals || [];
     Object.entries(goalMetrics).forEach(([area, solutionArea]) => {
       solutionArea.metrics.forEach((metric, index) => {
         if (publishedGoals.includes(metric.name)) {
-          const key = `${area}:${index}`;
-          const publishedTarget = publishedPlan?.goalTargets?.find(
-            (target) => target.key === key || target.name === metric.name,
-          )?.value;
-          window.selectedGoalKeys.add(key);
-          window.cascadeGoalTargets.set(
-            key,
-            Number.isFinite(publishedTarget) && publishedTarget >= 0
-              ? publishedTarget
-              : parseGoalMetricValue(metric.value),
-          );
+          window.selectedGoalKeys.add(`${area}:${index}`);
         }
       });
     });
