@@ -705,6 +705,12 @@
   display: none;
 }
 
+.demo-goal-error {
+  margin-top: 10px;
+  color: #a4262c;
+  font-size: 12px;
+}
+
 .demo-portfolio-target-editor label {
   display: flex;
   flex-wrap: wrap;

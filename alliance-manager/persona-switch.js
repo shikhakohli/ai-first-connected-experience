@@ -22,7 +22,7 @@
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
   const sarahCompletedTransactionsKey = "fabrikam-sarah-completed-transactions";
-  const buildVersion = "164";
+  const buildVersion = "165";
   const isSarah = !isEric && !isJane && !isPaul;
   const isSeatAddGoal = (goal) =>
     /\bNPSA\b|net paid seats?(?: adds?)?|paid seat adds?/i.test(goal)
@@ -612,7 +612,10 @@
       return form;
     };
     const savePortfolioTargets = (form) => {
-      if (!form.reportValidity()) return false;
+      if (!form.reportValidity()) {
+        showGoalError("Enter a valid, non-negative whole-number target for each goal before accepting.");
+        return false;
+      }
       const inputs = [...form.querySelectorAll("input")];
       const goalTargets = cascadedTargets.map((target, index) => {
         const value = Number(inputs[index].value);
@@ -625,12 +628,11 @@
           : value.toLocaleString("en-US");
         return { ...target, value, formattedValue };
       });
-      localStorage.setItem(portfolioGoalChoiceKey, JSON.stringify({
+      return saveGoalDecision({
         choice: "accepted",
         goals: plan.goals,
         goalTargets,
-      }));
-      return true;
+      });
     };
     const customerTitle = [...document.querySelectorAll("*")].find(
       (element) => element.children.length === 0 && element.textContent.trim() === "Customer overview",
@@ -647,6 +649,27 @@
 
     const panel = document.createElement("section");
     panel.className = "demo-inherited-goal-panel";
+    const showGoalError = (message) => {
+      panel.removeAttribute("aria-busy");
+      let error = panel.querySelector(".demo-goal-error");
+      if (!error) {
+        error = document.createElement("p");
+        error.className = "demo-goal-error";
+        error.setAttribute("role", "alert");
+        panel.appendChild(error);
+      }
+      error.textContent = message;
+    };
+    const saveGoalDecision = (decision) => {
+      try {
+        localStorage.setItem(portfolioGoalChoiceKey, JSON.stringify(decision));
+        return true;
+      } catch (error) {
+        console.error("Could not save portfolio goal", error);
+        showGoalError("Could not save your goal in browser storage. Free up browser storage or allow site data, then try again.");
+        return false;
+      }
+    };
     panel.innerHTML = `
       <div class="demo-inherited-goal-heading">
         <span class="demo-goal-icon">🎯</span>
@@ -921,12 +944,12 @@
         window.location.href = nextUrl.toString();
       });
       panel.querySelector('[data-goal-action="apply-organization"]')?.addEventListener("click", () => {
-        localStorage.setItem(portfolioGoalChoiceKey, JSON.stringify({
+        if (!saveGoalDecision({
           choice: "accepted",
           goals: plan.goals,
-        }));
-        window.location.href =
-          `./current-113.html?persona=sarah&view=customer&goalAccepted=${Date.now()}`;
+          goalTargets: cascadedTargets,
+        })) return;
+        applyGoalToPage(createGoalSummary(plan.goals), "accepted");
       });
       panel.querySelector('[data-goal-action="remove-goal"]')?.addEventListener("click", () => {
         localStorage.removeItem(portfolioGoalChoiceKey);
@@ -975,45 +998,21 @@
     };
 
     const applyGoalToPage = (goal, choice) => {
-      const updateGoalEditor = (attempt = 0) => {
-        const textarea = existingGoalCard.querySelector("textarea");
-        const setGoalButton = [...existingGoalCard.querySelectorAll("button")].find(
-          (button) => button.textContent.trim() === "Set Goal",
-        );
-        if (!textarea || !setGoalButton) {
-          const editGoalButton = [...existingGoalCard.querySelectorAll("button")].find(
-            (button) => button.textContent.includes("Edit goal"),
-          );
-          if (editGoalButton && attempt < 2) {
-            editGoalButton.click();
-            window.setTimeout(() => updateGoalEditor(attempt + 1), 0);
-          }
-          return;
-        }
-
-        const valueSetter = Object.getOwnPropertyDescriptor(
-          window.HTMLTextAreaElement.prototype,
-          "value",
-        )?.set;
-        valueSetter?.call(textarea, goal);
-        textarea.dispatchEvent(new Event("input", { bubbles: true }));
-
-        window.setTimeout(() => {
-          setGoalButton.click();
-          window.setTimeout(() => {
-            [...mainContent.querySelectorAll("*")].forEach((element) => {
-              if (element.children.length) return;
-              const text = element.textContent.trim();
-              if (text === "Modern Work Revenue") element.textContent = goal;
-              if (text.startsWith("Grow Modern Work revenue by 15% ·")) {
-                element.textContent = goal;
-              }
-            });
+      panel.querySelector(".demo-goal-error")?.remove();
+      panel.setAttribute("aria-busy", "true");
+      const request = new CustomEvent("portfolio-goal:set", {
+        cancelable: true,
+        detail: {
+          title: goal,
+          onApplied: () => {
+            panel.removeAttribute("aria-busy");
             showActiveGoal(goal, choice);
-          }, 50);
-        }, 0);
-      };
-      updateGoalEditor();
+          },
+        },
+      });
+      if (window.dispatchEvent(request)) {
+        showGoalError("The customer goal editor is not ready. Please reopen Customer from the navigation and try again.");
+      }
     };
 
     const initialTargetEditor = isSarah && cascadedTargets.length
@@ -1030,13 +1029,12 @@
       if (initialTargetEditor) {
         if (!savePortfolioTargets(initialTargetEditor)) return;
       } else {
-        localStorage.setItem(portfolioGoalChoiceKey, JSON.stringify({
+        if (!saveGoalDecision({
           choice: "accepted",
           goals: plan.goals,
-        }));
+        })) return;
       }
-      window.location.href =
-        `./current-113.html?persona=sarah&view=customer&goalAccepted=${Date.now()}`;
+      applyGoalToPage(createGoalSummary(plan.goals), "accepted");
     });
     panel.querySelector('[data-choice="set-organization"]')?.addEventListener("click", () => {
       window.location.href = "../goals.html";

@@ -18,14 +18,21 @@ const server = http.createServer((request, response) => {
 });
 
 async function verifyAcceptance(browser, base, scenario) {
-  const context = await browser.newContext({ viewport: { width: 1440, height: 1100 } });
+  const context = await browser.newContext({
+    viewport: scenario === "screenshot" ? { width: 2000, height: 1040 } : { width: 1440, height: 1100 },
+  });
   const page = await context.newPage();
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   try {
     await page.goto(`${base}/goals.html?goal=cspNpsaCopilotSmec`);
     const seatTarget = '.selected-goal-editor[data-goal-key="business:0"] input';
-    await page.locator(seatTarget).fill("7000");
+    const expectedTarget = scenario === "screenshot" ? 6710 : 7000;
+    if (scenario === "screenshot") {
+      await page.locator('.selected-goal-editor[data-goal-key="business:0"] [data-target-delta="100"]').click();
+    } else {
+      await page.locator(seatTarget).fill(String(expectedTarget));
+    }
     if (scenario === "republished") {
       await page.locator('[data-area="cloud"]').click();
       await page.locator('label.goal-metric-card:has(input[data-goal-key="cloud:0"])').click();
@@ -61,17 +68,62 @@ async function verifyAcceptance(browser, base, scenario) {
       (inputs) => inputs.every((input) => input.checkValidity()),
     );
     assert.ok(valid, "All cascaded targets must be populated before acceptance");
-    await page.getByRole("button", { name: "Accept Fabrikam goal", exact: true }).click();
+    const acceptButton = page.getByRole("button", { name: "Accept Fabrikam goal", exact: true });
+    if (scenario === "storage-error") {
+      await page.evaluate(() => {
+        window.originalSetItem = Storage.prototype.setItem;
+        Storage.prototype.setItem = function (key, value) {
+          if (key === "fabrikam-inherited-goal-choice") {
+            throw new DOMException("Storage quota exceeded", "QuotaExceededError");
+          }
+          return window.originalSetItem.call(this, key, value);
+        };
+      });
+      await acceptButton.click();
+      assert.match(await page.getByRole("alert").innerText(), /Could not save your goal/);
+      assert.equal(await page.evaluate(() => localStorage.getItem("fabrikam-inherited-goal-choice")), null);
+      await page.evaluate(() => {
+        Storage.prototype.setItem = window.originalSetItem;
+        delete window.originalSetItem;
+      });
+    }
+    let navigations = 0;
+    page.on("framenavigated", () => navigations++);
+    const beforeAccept = page.url();
+    if (scenario === "keyboard") {
+      await page.locator(".demo-portfolio-target-editor input").press("Enter");
+    } else {
+      await acceptButton.click();
+    }
     await page.getByRole("button", { name: "Edit goal targets", exact: true }).waitFor();
-    assert.match(await page.locator(".demo-active-progress-list").innerText(), /7,000 seat target/);
+    assert.match(
+      await page.locator(".demo-active-progress-list").innerText(),
+      new RegExp(`${expectedTarget.toLocaleString("en-US")} seat target`),
+    );
+    assert.equal(page.url(), beforeAccept, "Acceptance must apply on the current page");
+    assert.equal(navigations, 0, "Acceptance must not reload the page");
+    assert.equal(await page.getByRole("alert").count(), 0);
+    assert.equal(await page.locator(".demo-inherited-goal-panel").getAttribute("aria-busy"), null);
     const accepted = await page.evaluate(() => JSON.parse(localStorage.getItem("fabrikam-inherited-goal-choice")));
     assert.equal(accepted.choice, "accepted");
-    assert.equal(accepted.goalTargets.find((target) => target.key === "business:0").value, 7000);
-    if (scenario !== "new") {
+    assert.equal(accepted.goalTargets.find((target) => target.key === "business:0").value, expectedTarget);
+    if (scenario === "republished" || scenario === "legacy") {
       assert.equal(accepted.goalTargets.find((target) => target.key === "cloud:0").value, 3180000);
+    }
+    if (scenario === "screenshot" && process.env.PROTOTYPE_SCREENSHOT) {
+      await page.screenshot({ path: process.env.PROTOTYPE_SCREENSHOT, fullPage: true });
     }
     assert.deepEqual(errors, []);
     console.log(`PASS: Sarah accepts ${scenario} cascaded goals`);
+  } catch (error) {
+    console.error("Page URL:", page.url());
+    console.error("Browser errors:", errors);
+    console.error("Goal panel:", await page.locator(".demo-inherited-goal-panel").allTextContents());
+    console.error("Published and accepted state:", await page.evaluate(() => ({
+      published: localStorage.getItem("fabrikam-published-goals"),
+      accepted: localStorage.getItem("fabrikam-inherited-goal-choice"),
+    })));
+    throw error;
   } finally {
     await context.close();
   }
@@ -84,8 +136,8 @@ async function verifyAcceptance(browser, base, scenario) {
     browser = await chromium.launch(
       process.env.PLAYWRIGHT_CHANNEL ? { channel: process.env.PLAYWRIGHT_CHANNEL } : {},
     );
-    const base = `http://127.0.0.1:${server.address().port}`;
-    for (const scenario of ["new", "republished", "legacy"]) {
+    const base = process.env.PROTOTYPE_BASE_URL || `http://127.0.0.1:${server.address().port}`;
+    for (const scenario of ["screenshot", "new", "republished", "legacy", "keyboard", "storage-error"]) {
       await verifyAcceptance(browser, base, scenario);
     }
   } finally {
