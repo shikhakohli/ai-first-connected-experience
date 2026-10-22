@@ -33,7 +33,8 @@ function applyHealthDashboardOverrides(frameDocument) {
     const elements = root.matches ? [root, ...root.querySelectorAll("*")] : [];
     elements.forEach((element) => {
       if (element.matches('.pc-inline-target-stepper button[aria-label^="Decrease "]')) {
-        element.disabled = true;
+        element.remove();
+        return;
       }
       ["aria-label", "placeholder", "title"].forEach((attribute) => {
         if (!element.hasAttribute(attribute)) return;
