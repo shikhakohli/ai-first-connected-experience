@@ -22,7 +22,7 @@
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
   const sarahCompletedTransactionsKey = "fabrikam-sarah-completed-transactions";
-  const buildVersion = "168";
+  const buildVersion = "169";
   const isSarah = !isEric && !isJane && !isPaul;
   const isSeatAddGoal = (goal) =>
     /\bNPSA\b|net paid seats?(?: adds?)?|paid seat adds?/i.test(goal)
@@ -2461,7 +2461,7 @@
           <div class="demo-deal-fields demo-benefit-price-fields">
             <label>Distributor<input data-field="distributor" value="Fabrikam" readonly /></label>
             <label>Seat price offered by distributor ($)<input data-field="distributor-price" type="number" min="0" step="0.01" value="${distributorSeatPrice.toFixed(2)}" readonly /></label>
-            <label>Seat count<input data-field="whitespace" type="number" min="1" step="1" value="${resellerSeatCount}" readonly /></label>
+            <label>Seat count<input data-field="whitespace" type="number" min="1" step="1" value="${resellerSeatCount}" /></label>
           </div>
           <section class="demo-deal-section">
             <div class="demo-deal-section-title">
@@ -2567,11 +2567,10 @@
           currency: "USD",
         });
         const shareSlider = editor.querySelector("[data-reseller-incentive-share]");
+        const seatField = editor.querySelector('[data-field="whitespace"]');
         const updateResellerCalculator = () => {
-          const seats = Math.max(
-            1,
-            Number(editor.querySelector('[data-field="whitespace"]').value || 0),
-          );
+          const seats = Math.max(1, Number(seatField.value || 0));
+          if (Number(seatField.value) !== seats) seatField.value = String(seats);
           const distributorPrice = Math.max(
             0,
             Number(editor.querySelector('[data-field="distributor-price"]').value || 0),
@@ -2612,6 +2611,8 @@
         };
 
         shareSlider.addEventListener("input", updateResellerCalculator);
+        seatField.addEventListener("input", updateResellerCalculator);
+        seatField.addEventListener("change", updateResellerCalculator);
         editor.querySelector('[data-action="proposal"]').addEventListener("click", () => {
           openGcpsProposalWorkspace({
             customer,
