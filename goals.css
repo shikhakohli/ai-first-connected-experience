@@ -64,11 +64,13 @@
 }
 .cascade-target-editor button:first-child { border-radius: 4px 0 0 4px; }
 .cascade-target-editor button:last-child { border-radius: 0 4px 4px 0; }
+.cascade-target-editor button:disabled { color: #a19f9d; background: #f3f2f1; border-color: #d2d0ce; cursor: not-allowed; }
 .cascade-target-editor input {
   width: 82px; height: 24px; padding: 0 5px; border: 1px solid #bda9cc;
   border-inline: 0; text-align: right; font-family: inherit; font-size: 11px;
 }
 .cascade-target-editor > strong { min-width: 82px; color: #3b2452; font-size: 11px; text-align: right; }
+.cascade-target-editor > .cascade-target-error { grid-column: 1 / -1; color: #a4262c; }
 .cascade-plan { margin-top: 12px; padding: 13px; background: #f5f1f8; border-radius: 7px; }
 .cascade-plan > div:first-child { display: flex; gap: 9px; }
 .cascade-plan > div:first-child > span { color: #7b40b4; font-weight: 700; }
