@@ -22,7 +22,7 @@
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
   const sarahCompletedTransactionsKey = "fabrikam-sarah-completed-transactions";
-  const buildVersion = "166";
+  const buildVersion = "167";
   const isSarah = !isEric && !isJane && !isPaul;
   const isSeatAddGoal = (goal) =>
     /\bNPSA\b|net paid seats?(?: adds?)?|paid seat adds?/i.test(goal)
@@ -2380,7 +2380,7 @@
         ${usesBenefitSharing ? `
           <div class="demo-deal-fields demo-benefit-price-fields">
             <label>ERP price per seat ($)<input data-field="erp-price" type="number" min="0" step="0.01" value="21.84" readonly /></label>
-            <label>Microsoft partner price per seat ($)<input data-field="partner-price" type="number" min="0" step="0.01" value="17.48" /></label>
+            <label>Microsoft partner price per seat ($)<input data-field="partner-price" type="number" min="0" step="0.01" value="17.48"${isSarah ? " readonly" : ""} /></label>
             <label>Seat count<input data-field="whitespace" type="number" min="1" step="1" value="${whitespace}" /></label>
           </div>
           <section class="demo-deal-section">
@@ -2425,7 +2425,7 @@
           <section class="demo-deal-section demo-benefit-sharing-section">
             <div class="demo-deal-section-title">
               <h5>Benefit sharing</h5>
-              <span>Choose how much to keep versus pass through to the ${isPaul ? "customer" : "reseller"}</span>
+              <span>${isSarah ? "Promotion is applied in full automatically. Share margin and incentives with the reseller." : `Choose how much to keep versus pass through to the ${isPaul ? "customer" : "reseller"}`}</span>
             </div>
             <div class="demo-benefit-sharing">
               ${[
@@ -2433,7 +2433,7 @@
                 ["margin", "Margin total"],
                 ["incentives", "Incentives total"],
                 ["total", "Total benefits"],
-              ].map(([key, label]) => `
+              ].filter(([key]) => !isSarah || key !== "promotion").map(([key, label]) => `
                 <div class="${key === "total" ? "total" : ""}" data-benefit-share-row="${key}">
                   <div><strong>${label}</strong><output data-benefit-total="${key}"></output></div>
                   ${renderShareSlider(`data-benefit-share="${key}" aria-label="${label} percentage kept by partner"`)}
@@ -2662,7 +2662,9 @@
           style: "currency",
           currency: "USD",
         });
-        const categoryKeys = ["promotion", "margin", "incentives"];
+        const categoryKeys = isSarah
+          ? ["margin", "incentives"]
+          : ["promotion", "margin", "incentives"];
         const sharingTarget = isPaul ? "customer" : "reseller";
 
         const updateBenefitCalculator = () => {
@@ -2694,8 +2696,8 @@
             margin: marginTotal,
             incentives: incentivesTotal,
           };
-          const totalBenefits = Object.values(totals)
-            .reduce((sum, value) => sum + value, 0);
+          const totalBenefits = categoryKeys
+            .reduce((sum, key) => sum + totals[key], 0);
 
           editor.querySelector('[data-benefit="promotion"]').textContent =
             usd.format(promotionTotal);
@@ -2745,7 +2747,8 @@
           editor.querySelector('[data-benefit-passed="total"]').textContent =
             `Passes ${100 - totalKeptPercent}% · ${usd.format(passedTotal)} to ${sharingTarget}`;
 
-          const offeredPrice = Math.max(0, partnerPrice - passedTotal / seats);
+          const promotionDiscount = isSarah ? promotionTotal : 0;
+          const offeredPrice = Math.max(0, partnerPrice - (promotionDiscount + passedTotal) / seats);
           const finalDealSize = offeredPrice * seats;
           editor.querySelector('[data-benefit-result="offered-price"]').textContent =
             `${usd.format(offeredPrice)} per seat`;
