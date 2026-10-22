@@ -22,7 +22,7 @@
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
   const sarahCompletedTransactionsKey = "fabrikam-sarah-completed-transactions";
-  const buildVersion = "167";
+  const buildVersion = "168";
   const isSarah = !isEric && !isJane && !isPaul;
   const isSeatAddGoal = (goal) =>
     /\bNPSA\b|net paid seats?(?: adds?)?|paid seat adds?/i.test(goal)
@@ -3055,7 +3055,10 @@
     detail.addEventListener("click", (event) => {
       const button = event.target.closest("button");
       if (!button) return;
-      if (["Create reseller customer proposal", "Prepare reseller quote"].includes(button.textContent.trim())) {
+      if (
+        ["Create reseller customer proposal", "Prepare reseller quote"].includes(button.textContent.trim())
+        && !button.closest(".demo-customer-recommendation")
+      ) {
         openGcpsProposalWorkspace();
       }
       if (button.dataset.action === "prepare-offer") {
