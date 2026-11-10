@@ -11,7 +11,7 @@ const start = bundle.indexOf("y === `growth` &&");
 const end = bundle.indexOf(", y === `risk`", start);
 assert.ok(start >= 0 && end > start, "Growth tile renderer must exist");
 const renderer = bundle.slice(start, end);
-const scenarioNames = ["Grow - Scale Ready", "Acquire - Low Chat", "Acquire - No M365"];
+const scenarioNames = ["Grow Copilot - Scale Ready", "Acquire Copilot - Low Chat", "Acquire Copilot - No M365"];
 
 function renderGrowth(savedGoal) {
   const prompts = [];
@@ -36,7 +36,7 @@ for (const savedGoal of [null, "Grow paid Copilot seats"]) {
       scenarioNames,
     );
     for (const [index, card] of newCards.entries()) {
-      assert.equal(card.children[3].children, "N/A");
+      assert.match(card.children[3].children, /^\u20ac[1-9]\d{0,2}(,\d{3})*\.\d{2}$/);
       const summary = card.children[5].children;
       assert.match(summary, /^Customers /);
       assert.match(summary, /Copilot/);
@@ -50,7 +50,7 @@ test("Copilot goal filtering retains all three new scenarios", () => {
   const start = personaSource.indexOf("    const alignRecommendationsToGoals = ");
   const end = personaSource.indexOf("    const showActiveGoal = ", start);
   assert.ok(start >= 0 && end > start, "Goal alignment handler must exist");
-  const titles = [...scenarioNames, "Copilot Monetization", "Copilot Chat Activation", "Promotions"];
+  const titles = [...scenarioNames, "Copilot Free to Paid", "Copilot Chat Activation", "Promotions"];
   const cards = titles.map((title) => ({
     hidden: false,
     querySelector: () => ({ textContent: title }),

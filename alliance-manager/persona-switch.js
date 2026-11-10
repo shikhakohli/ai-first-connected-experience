@@ -22,7 +22,7 @@
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
   const sarahCompletedTransactionsKey = "fabrikam-sarah-completed-transactions";
-  const buildVersion = "170";
+  const buildVersion = "171";
   const isSarah = !isEric && !isJane && !isPaul;
   const isSeatAddGoal = (goal) =>
     /\bNPSA\b|net paid seats?(?: adds?)?|paid seat adds?/i.test(goal)
@@ -636,11 +636,11 @@
 
       const copilotGoal = activeGoals.some((activeGoal) => /copilot/i.test(activeGoal));
       const relevantTitles = new Set([
-        "Copilot Monetization",
+        "Copilot Free to Paid",
         "Copilot Chat Activation",
-        "Grow - Scale Ready",
-        "Acquire - Low Chat",
-        "Acquire - No M365",
+        "Grow Copilot - Scale Ready",
+        "Acquire Copilot - Low Chat",
+        "Acquire Copilot - No M365",
       ]);
       const woodgroveCard = [...mainContent.querySelectorAll(".bg-white")].find(
         (card) => card.textContent.includes("Woodgrove")
@@ -671,7 +671,7 @@
       if (existingAcquisition) return;
 
       const monetizationCard = [...recommendationGrid.children].find(
-        (card) => card.textContent.includes("Copilot Monetization"),
+        (card) => card.textContent.includes("Copilot Free to Paid"),
       );
       if (!monetizationCard) return;
       const acquisitionCard = monetizationCard.cloneNode(true);
@@ -1334,7 +1334,7 @@
       ["Contoso Customer 873", 783],
       ["Contoso Customer 872", 768],
       ["Contoso Customer 876", 766],
-      ["Copilot Monetization", 10634],
+      ["Copilot Free to Paid", 10634],
       ["Copilot Acquisition", 3500],
       ["Copilot Chat Activation", 0],
     ]);
@@ -1394,7 +1394,7 @@
         const firstCustomerCard = recommendationGrid?.children?.[0];
         if (firstCustomerCard) {
           const replacements = new Map([
-            ["EA to CSP migrations", "Copilot Monetization"],
+            ["EA to CSP migrations", "Copilot Free to Paid"],
             ["Contoso Customer 588", "Contoso Customer 116"],
             ["Microsoft 365 E5", "Microsoft 365 Copilot"],
             [
@@ -1555,8 +1555,8 @@
         <div class="demo-user-prompt">Show me the customers behind the Monetize Copilot recommendation.</div>
         <div class="demo-ai-label">✣ <strong>Partner Agent</strong> <span>AI-generated content may be incorrect</span></div>
         <div class="demo-copilot-summary">
-          <h1>Copilot Monetization Recommendation Details</h1>
-          <p>I found <strong>${recommendationCustomers.length} Copilot Monetization recommendation${recommendationCustomers.length === 1 ? "" : "s"}</strong> for ${isPaul ? "Apex Partners" : "Journey Innovations"}.</p>
+          <h1>Copilot Free to Paid Recommendation Details</h1>
+          <p>I found <strong>${recommendationCustomers.length} Copilot Free to Paid recommendation${recommendationCustomers.length === 1 ? "" : "s"}</strong> for ${isPaul ? "Apex Partners" : "Journey Innovations"}.</p>
           <h2>Key insights</h2>
           <ul>
             <li>The recommendations are concentrated in Contoso customer accounts managed by ${isPaul ? "Apex Partners" : "Journey Innovations"}.</li>
@@ -3243,7 +3243,7 @@
 
       const recommendationCard = detailsButton.closest(".bg-white");
       if (isPaul) {
-        if (!recommendationCard?.textContent.includes("Copilot Monetization")) return;
+        if (!recommendationCard?.textContent.includes("Copilot Free to Paid")) return;
         event.preventDefault();
         event.stopPropagation();
         openJourneyRecommendation("customers");

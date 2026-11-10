@@ -25066,7 +25066,7 @@ function EntityDetailView({
             value: i ? `€420K` : `€96K`,
             detail: `Eligible promotions that can improve deal economics and increase close probability.`
         }, {
-            title: `Copilot Monetization`,
+            title: `Copilot Free to Paid`,
             value: i ? `€360K` : `€84K`,
             detail: `Customers using free Copilot Chat who show strong propensity to convert to paid licenses.`
         }, {
@@ -25319,7 +25319,7 @@ function EntityDetailView({
                         className: `flex items-center gap-2 mb-4`,
                         children: [(0, P.jsx)(`span`, {
                             className: `text-[18px]`,
-                            children: e.title === `Growth potential` ? `📈` : e.title === `Revenue at risk` ? `🟣` : e.title === `Pipeline Development` ? `📊` : e.title === `Seat expansion` ? `●+` : e.title === `Promotions` ? `🎯` : e.title === `Copilot Monetization` ? `🤖` : e.title === `EA to CSP migrations` ? `🔄` : e.title === `Copilot Chat Activation` ? `💬` : e.title === `Renewals approaching` ? `🔔` : e.title === `Low utilization` ? `⚠` : e.title === `Revenue erosion` ? `📉` : e.title === `Eligible incentives` ? `🎁` : e.title === `Benefits` ? `⭐` : e.title === `Credits` ? `💳` : `🎁`
+                            children: e.title === `Growth potential` ? `📈` : e.title === `Revenue at risk` ? `🟣` : e.title === `Pipeline Development` ? `📊` : e.title === `Seat expansion` ? `●+` : e.title === `Promotions` ? `🎯` : e.title === `Copilot Free to Paid` ? `🤖` : e.title === `EA to CSP migrations` ? `🔄` : e.title === `Copilot Chat Activation` ? `💬` : e.title === `Renewals approaching` ? `🔔` : e.title === `Low utilization` ? `⚠` : e.title === `Revenue erosion` ? `📉` : e.title === `Eligible incentives` ? `🎁` : e.title === `Benefits` ? `⭐` : e.title === `Credits` ? `💳` : `🎁`
                         }), (0, P.jsx)(`p`, {
                             className: `text-[15px] font-bold`,
                             children: e.title
@@ -26889,7 +26889,7 @@ function Zs({
                                 summary: `Customers qualify for relevant promotions that can improve deal economics and increase close probability.`
                             }, {
                                 icon: `🤖`,
-                                name: `Copilot Monetization`,
+                                name: `Copilot Free to Paid`,
                                 revenue: `9,568,690.68`,
                                 summary: `Customers are actively using free chat capabilities and show high propensity to convert to paid licenses.`
                             }, {
@@ -26904,18 +26904,18 @@ function Zs({
                                 summary: `Customers have purchased Copilot licenses but show low utilization. Engage to drive adoption and increase usage.`
                             }, {
                                 icon: `📈`,
-                                name: `Grow - Scale Ready`,
-                                revenue: `N/A`,
+                                name: `Grow Copilot - Scale Ready`,
+                                revenue: `6,284,400.00`,
                                 summary: `Customers show strong usage of existing Copilot licenses and are ready to expand. Grow revenue by extending paid Copilot coverage across their organization.`
                             }, {
                                 icon: `💬`,
-                                name: `Acquire - Low Chat`,
-                                revenue: `N/A`,
+                                name: `Acquire Copilot - Low Chat`,
+                                revenue: `4,218,600.00`,
                                 summary: `Customers show low Copilot Chat engagement. Build awareness and demonstrate value to increase usage and convert customers to paid Copilot licenses.`
                             }, {
                                 icon: `✨`,
-                                name: `Acquire - No M365`,
-                                revenue: `N/A`,
+                                name: `Acquire Copilot - No M365`,
+                                revenue: `3,142,200.00`,
                                 summary: `Customers do not currently use Microsoft 365. Introduce paid Copilot as a new customer acquisition opportunity to grow your customer base and recurring revenue.`
                             }].map(e => (0, P.jsxs)(`div`, {
                                 className: `relative bg-white rounded-md border p-4 shadow-sm min-h-[230px] flex flex-col ${savedGoal?`border-[#0f6cbd] ring-2 ring-[#c7e0f4]`:`border-[rgba(0,0,0,0.1)]`}`,
