@@ -22,7 +22,7 @@
     : journeyCustomerProposalsKey;
   const journeyTransactionSignalKey = "journey-innovations-transaction-signal";
   const sarahCompletedTransactionsKey = "fabrikam-sarah-completed-transactions";
-  const buildVersion = "169";
+  const buildVersion = "170";
   const isSarah = !isEric && !isJane && !isPaul;
   const isSeatAddGoal = (goal) =>
     /\bNPSA\b|net paid seats?(?: adds?)?|paid seat adds?/i.test(goal)
@@ -635,7 +635,13 @@
       if (!recommendationGrid) return;
 
       const copilotGoal = activeGoals.some((activeGoal) => /copilot/i.test(activeGoal));
-      const relevantTitles = new Set(["Copilot Monetization", "Copilot Chat Activation"]);
+      const relevantTitles = new Set([
+        "Copilot Monetization",
+        "Copilot Chat Activation",
+        "Grow - Scale Ready",
+        "Acquire - Low Chat",
+        "Acquire - No M365",
+      ]);
       const woodgroveCard = [...mainContent.querySelectorAll(".bg-white")].find(
         (card) => card.textContent.includes("Woodgrove")
           && card.textContent.includes("View recommendation details"),

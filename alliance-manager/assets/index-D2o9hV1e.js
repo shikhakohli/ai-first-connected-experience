@@ -26902,6 +26902,21 @@ function Zs({
                                 name: `Copilot Chat Activation`,
                                 revenue: `N/A`,
                                 summary: `Customers have purchased Copilot licenses but show low utilization. Engage to drive adoption and increase usage.`
+                            }, {
+                                icon: `📈`,
+                                name: `Grow - Scale Ready`,
+                                revenue: `N/A`,
+                                summary: `Customers show strong usage of existing Copilot licenses and are ready to expand. Grow revenue by extending paid Copilot coverage across their organization.`
+                            }, {
+                                icon: `💬`,
+                                name: `Acquire - Low Chat`,
+                                revenue: `N/A`,
+                                summary: `Customers show low Copilot Chat engagement. Build awareness and demonstrate value to increase usage and convert customers to paid Copilot licenses.`
+                            }, {
+                                icon: `✨`,
+                                name: `Acquire - No M365`,
+                                revenue: `N/A`,
+                                summary: `Customers do not currently use Microsoft 365. Introduce paid Copilot as a new customer acquisition opportunity to grow your customer base and recurring revenue.`
                             }].map(e => (0, P.jsxs)(`div`, {
                                 className: `relative bg-white rounded-md border p-4 shadow-sm min-h-[230px] flex flex-col ${savedGoal?`border-[#0f6cbd] ring-2 ring-[#c7e0f4]`:`border-[rgba(0,0,0,0.1)]`}`,
                                 children: [savedGoal && (0, P.jsx)(`span`, {
